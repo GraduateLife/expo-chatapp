@@ -1,22 +1,24 @@
-import { Stack } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
+import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
+import { Button } from '~/components/Button';
 
-import { ScreenContent } from '~/components/ScreenContent';
+export default function App() {
+  const width = useSharedValue(100);
 
-export default function Home() {
+  const handlePress = () => {
+    width.value = withSpring(width.value + 50);
+  };
+
   return (
-    <>
-      <Stack.Screen options={{ title: 'Tab One' }} />
-      <View style={styles.container}>
-        <ScreenContent path="app/(tabs)/index.tsx" title="Tab One" />
-      </View>
-    </>
+    <View style={{ flex: 1, alignItems: 'center' }}>
+      <Animated.View
+        style={{
+          width,
+          height: 100,
+          backgroundColor: 'violet',
+        }}
+      />
+      <Button onPress={handlePress} title="Click me" />
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-  },
-});
