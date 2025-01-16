@@ -1,10 +1,13 @@
 import { createTamagui, TamaguiProvider, Theme, View } from 'tamagui';
 import '../global.css';
 import * as Font from 'expo-font';
-import { Stack } from 'expo-router';
+import { Link, router, Stack } from 'expo-router';
 import defaultConfig from '@tamagui/config/v3';
 import { useState, useEffect } from 'react';
-import { Text } from 'react-native';
+import { Platform, Text } from 'react-native';
+import FullPageLoading from './FullPageLoading';
+import { StatusBar } from 'expo-status-bar';
+import { Button } from 'tamagui';
 // import tamaguiConfig from '~/tamagui.config';
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -38,16 +41,37 @@ export default function RootLayout() {
   }, []);
 
   if (!appIsReady) {
-    return <Text>Loading...</Text>;
+    return (
+      <TamaguiProvider config={tamaguiConfig}>
+        <Theme name="blue">
+          <FullPageLoading />
+        </Theme>
+      </TamaguiProvider>
+    );
   }
   return (
     <TamaguiProvider config={tamaguiConfig}>
-      <Theme name="light">
+      <Theme name="blue">
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="chatRoom/[contactId]"
+            options={{
+              headerStyle: { backgroundColor: '#38bdf8' },
+              headerTintColor: '#fff',
+              headerLeft: () => (
+                <Button chromeless size="$3" onPress={() => router.back()}>
+                  <Button.Text>
+                    <Text className="text-white">Back</Text>
+                  </Button.Text>
+                </Button>
+              ),
+            }}
+          />
           <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         </Stack>
       </Theme>
+      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
     </TamaguiProvider>
   );
 }
