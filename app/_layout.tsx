@@ -5,9 +5,11 @@ import { Link, router, Stack } from 'expo-router';
 import defaultConfig from '@tamagui/config/v3';
 import { useState, useEffect } from 'react';
 import { Platform, Text } from 'react-native';
-import FullPageLoading from './FullPageLoading';
+import FullPageLoading from '../components/Common/FullPageLoading';
 import { StatusBar } from 'expo-status-bar';
 import { Button } from 'tamagui';
+import BackButton from '~/components/Common/BackButton';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 // import tamaguiConfig from '~/tamagui.config';
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -50,28 +52,23 @@ export default function RootLayout() {
     );
   }
   return (
-    <TamaguiProvider config={tamaguiConfig}>
-      <Theme name="blue">
-        <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="chatRoom/[contactId]"
-            options={{
-              headerStyle: { backgroundColor: '#38bdf8' },
-              headerTintColor: '#fff',
-              headerLeft: () => (
-                <Button chromeless size="$3" onPress={() => router.back()}>
-                  <Button.Text>
-                    <Text className="text-white">Back</Text>
-                  </Button.Text>
-                </Button>
-              ),
-            }}
-          />
-          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        </Stack>
-      </Theme>
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-    </TamaguiProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <TamaguiProvider config={tamaguiConfig}>
+        <Theme name="blue">
+          <Stack>
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="chatRoom/[contactId]"
+              options={{
+                headerStyle: { backgroundColor: '#38bdf8' },
+                headerTintColor: '#fff',
+                headerLeft: () => <BackButton />,
+              }}
+            />
+          </Stack>
+        </Theme>
+        <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
+      </TamaguiProvider>
+    </GestureHandlerRootView>
   );
 }
