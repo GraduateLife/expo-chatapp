@@ -57,14 +57,7 @@ export default function RootLayout() {
         <Theme name="blue">
           <Stack>
             <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="chatRoom/[contactId]"
-              options={{
-                headerStyle: { backgroundColor: '#38bdf8' },
-                headerTintColor: '#fff',
-                headerLeft: () => <BackButton />,
-              }}
-            />
+            <Stack.Screen name="chatRoom" options={{ headerShown: false }} />
           </Stack>
         </Theme>
         <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
