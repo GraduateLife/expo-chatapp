@@ -2,39 +2,56 @@ import React from 'react';
 import { View, Text, Image } from 'react-native';
 import { cn } from '../ui/utils';
 
-interface ChatBubbleInfoProps {
-  username: string;
-  avatarUrl?: string;
+type ChatBubbleInfoProps = Contact & {
   className?: string;
-  imageSize?: number;
-  textClassName?: string;
-  isUser: boolean;
-}
+};
+
+const getUserNameFirstLetter = (userName: string) => {
+  return userName.charAt(0).toUpperCase();
+};
+
+const getOnlineStatusColor = (onlineStatus: OnlineStatus) => {
+  switch (onlineStatus) {
+    case 'online':
+      return 'bg-green-500';
+    case 'offline':
+      return 'bg-gray-400';
+    case 'busy':
+      return 'bg-amber-500';
+  }
+};
 
 export const ChatBubbleInfo = ({
-  username,
-  isUser,
+  userName,
   avatarUrl,
   className,
-  imageSize = 32, // default size of 32px (h-8 w-8)
-  textClassName,
+  signature,
+  onlineStatus,
 }: ChatBubbleInfoProps) => {
   return (
-    <View className={cn('items-center gap-2', isUser ? 'flex-row-reverse' : 'flex-row', className)}>
-      {avatarUrl ? (
-        <Image
-          source={{ uri: avatarUrl }}
-          className={cn('rounded-full', isUser ? 'ml-2' : 'mr-2')}
-          style={{ width: imageSize, height: imageSize }}
-        />
-      ) : (
-        <View
-          className={cn('items-center justify-center rounded-full bg-yellow-300')}
-          style={{ width: imageSize, height: imageSize }}>
-          <Text className="font-medium text-gray-700">{username.charAt(0).toUpperCase()}</Text>
+    <View className={cn('flex-row items-center gap-2', className)}>
+      <View className="relative flex-row items-center gap-2">
+        {avatarUrl ? (
+          <Image
+            source={{ uri: avatarUrl }}
+            className={cn('rounded-full')}
+            style={{ width: 40, height: 40 }}
+          />
+        ) : (
+          <View
+            className={cn('items-center justify-center rounded-full bg-yellow-300')}
+            style={{ width: 40, height: 40 }}>
+            <Text className="text-lg text-gray-700">{getUserNameFirstLetter(userName)}</Text>
+          </View>
+        )}
+        <View className="absolute bottom-0 right-0">
+          <View className={cn('size-3 rounded-full', getOnlineStatusColor(onlineStatus))} />
         </View>
-      )}
-      <Text className={cn('text-sm font-medium', textClassName)}>{username}</Text>
+      </View>
+      <View className="flex-1">
+        <Text className={cn('text-lg font-medium')}>{userName}</Text>
+        <Text className="text-sm text-gray-500">{signature}</Text>
+      </View>
     </View>
   );
 };

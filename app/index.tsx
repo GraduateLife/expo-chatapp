@@ -12,7 +12,7 @@ export default function Welcome() {
       <View className="flex h-full w-full bg-slate-100 ">
         <SafeAreaView className="mx-auto flex h-full w-[90%] items-center justify-center">
           <Text className="font-[delius] text-6xl font-bold text-black">Welcome!</Text>
-          <Image source={require('~/assets/logo.png')} className="my-4 size-80" />
+          <Image source={require('~/assets/icon.png')} className="my-4 size-80" />
           <View className="w-full">
             <Theme name="green">
               <Button

@@ -16,7 +16,7 @@ export default function MainLayout() {
           name="index"
           options={{
             title: 'Chats',
-            tabBarLabel: ({ color }) => <Text className={`text-[${color}]`}>Chats</Text>,
+
             tabBarIcon: ({ color }) => <Ionicons name="chatbubbles" size={24} color={color} />,
           }}
         />
@@ -24,7 +24,7 @@ export default function MainLayout() {
           name="contacts"
           options={{
             title: 'Contacts',
-            tabBarLabel: ({ color }) => <Text className={`text-[${color}]`}>Contacts</Text>,
+
             tabBarIcon: ({ color }) => (
               <MaterialCommunityIcons name="phone-outgoing" size={24} color={color} />
             ),
@@ -47,7 +47,6 @@ export default function MainLayout() {
           name="saves"
           options={{
             title: 'Saves',
-            tabBarLabel: ({ color }) => <Text className={`text-[${color}]`}>Saves</Text>,
             tabBarIcon: ({ color }) => <Feather name="box" size={24} color={color} />,
           }}
         />
@@ -55,7 +54,6 @@ export default function MainLayout() {
           name="account"
           options={{
             title: 'Account',
-            tabBarLabel: ({ color }) => <Text className={`text-[${color}]`}>Account</Text>,
             tabBarIcon: ({ color }) => <AntDesign name="setting" size={24} color={color} />,
           }}
         />

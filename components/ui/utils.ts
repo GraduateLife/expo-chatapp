@@ -34,3 +34,12 @@ export function formatDay(date: Date = new Date()): string {
 
   return `${day}, ${month} ${dateNum}`;
 }
+
+export const busy = (time: number) => {
+  const p = new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('done');
+    }, time);
+  });
+  return p;
+};
