@@ -1,11 +1,15 @@
 import React, { ReactNode } from 'react';
-import { View, ViewStyle } from 'react-native';
+import { View, ViewStyle, Image, Pressable, Linking } from 'react-native';
+import { cn } from '../ui/utils';
+import { Toast, useToastController } from '@tamagui/toast';
 
 interface AspectRatioProps {
   ratio?: number;
-  children: ReactNode;
+  children?: ReactNode;
   className?: string;
   style?: ViewStyle;
+  imageUrl?: string;
+  coverMode?: 'contain' | 'cover';
 }
 
 export const AspectRatio: React.FC<AspectRatioProps> = ({
@@ -13,7 +17,23 @@ export const AspectRatio: React.FC<AspectRatioProps> = ({
   children,
   className,
   style,
+  imageUrl,
 }) => {
+  if (imageUrl) {
+    return (
+      <View className={className}>
+        <Image
+          className="h-full w-full rounded-lg"
+          source={{ uri: imageUrl }}
+          style={{
+            aspectRatio: ratio,
+            resizeMode: 'cover',
+          }}
+        />
+      </View>
+    );
+  }
+
   return (
     <View
       className={className}
