@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { ChatBubble } from '~/components/ChatRoom/ChatBubble';
 import { ChatBubbleInfo } from '~/components/ChatRoom/ChatBubbleInfo';
-import { cn, formatDay } from '~/components/ui/utils';
+import { cn, formatDay, getImageAspectRatio } from '~/components/ui/utils';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Input } from 'tamagui';
 import { StatusBar } from 'expo-status-bar';
@@ -25,6 +25,8 @@ import { Image } from 'react-native';
 import { AspectRatio } from '~/components/Common/AspectRatio';
 import { Conversation } from '~/components/ChatRoom/Conversation';
 import { useMessageStore } from '~/store/messageStore';
+import { formatFileSize } from '~/components/ui/utils';
+import { useInputStore } from '~/store/inputStore';
 
 const Header = () => {
   const { contactId } = useLocalSearchParams();
@@ -57,37 +59,60 @@ const Header = () => {
 };
 
 export default function ChatRoom() {
-  const { selectedImage, setSelectedImage } = useMessageStore();
-
   return (
-    <View className="relative flex-1 bg-white pb-[50px]">
-      <Header />
-      <KeyboardAvoidingView behavior="padding" className="flex-1" keyboardVerticalOffset={10}>
-        <Conversation />
-
-        {selectedImage && (
-          <View className="relative mb-4 min-h-16 bg-stone-200/30">
-            <AspectRatio ratio={4 / 3} className={`h-[100px]`}>
-              <Image source={{ uri: selectedImage }} className="h-full w-full" />
-            </AspectRatio>
-            <TouchableOpacity
-              className="absolute right-2 top-2 rounded-full bg-white/30 p-1"
-              onPress={() => setSelectedImage(null)}>
-              <Ionicons name="close" size={24} color="black" />
-            </TouchableOpacity>
-          </View>
-        )}
-      </KeyboardAvoidingView>
-      <InputArea />
-    </View>
+    <KeyboardAvoidingView
+      className="flex-1"
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={0}>
+      <View className="flex-1 bg-white">
+        <Header />
+        <View className="flex-1">
+          <Conversation />
+        </View>
+        <View className="w-full bg-white">
+          <InputArea />
+        </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
+const ImagePreviewer = () => {
+  const { imageUri, imageHeight, imageWidth, imageType, imageFileSize, setImageProperties } =
+    useMessageStore();
+  if (!imageUri) return null;
+  return (
+    <View className=" bg-stone-100/90">
+      <View className="flex-row items-center justify-between">
+        <View className="relative h-[50px]  ">
+          <AspectRatio ratio={getImageAspectRatio(imageWidth, imageHeight)} className={`h-[50px]`}>
+            <Image source={{ uri: imageUri }} className="h-full w-full" />
+          </AspectRatio>
+        </View>
+        <View className="flex-1 pl-3">
+          <Text className="text-md text-stone-500">{`Type: ${imageType}`}</Text>
+          <Text className="text-md text-stone-500">{`Size: ${formatFileSize(imageFileSize)}`}</Text>
+          <Text className="text-md text-stone-500">{`Ratio: ${getImageAspectRatio(imageWidth, imageHeight)} (${imageWidth}px x ${imageHeight}px)`}</Text>
+        </View>
+        <TouchableOpacity
+          className="mr-2 rounded-full bg-blue-500/30 p-1"
+          onPress={() => setImageProperties(null)}>
+          <Ionicons name="close" size={24} color="white" />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
 const PhotoPicker = () => {
-  const { setSelectedImage } = useMessageStore();
+  const { setImageProperties } = useMessageStore();
+  const { setInputFocused } = useInputStore();
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
+    // Dismiss keyboard and reset focus
+    Keyboard.dismiss();
+    setInputFocused(false);
+
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images', 'videos'],
       allowsEditing: true,
@@ -96,8 +121,14 @@ const PhotoPicker = () => {
     });
 
     if (!result.canceled) {
-      const imageUri = result.assets[0].uri;
-      setSelectedImage(imageUri);
+      const asset = result.assets[0];
+      setImageProperties({
+        uri: asset.uri,
+        height: asset.height,
+        width: asset.width,
+        type: asset.mimeType,
+        fileSize: asset.fileSize,
+      });
     }
   };
 
@@ -109,12 +140,20 @@ const PhotoPicker = () => {
 };
 
 const InputArea = () => {
-  const { message, setMessage, selectedImage, setSelectedImage } = useMessageStore();
+  const { message, setMessage, imageUri, setImageProperties } = useMessageStore();
+  const { isInputFocused, setInputFocused } = useInputStore();
   const inputRef = useRef<TextInput>(null);
+
+  const getMarginBottom = () => {
+    if (isInputFocused) return 'mb-0';
+    if (imageUri) return 'mb-12';
+    return 'mb-6';
+  };
+
   const handleSendMessage = () => {
     // Add your send message logic here
-    if (selectedImage) {
-      console.log('send image', selectedImage);
+    if (imageUri) {
+      console.log('send image', imageUri);
     }
     console.log('send message', message);
     // After successful upload/send:
@@ -122,10 +161,17 @@ const InputArea = () => {
   };
 
   return (
-    <>
-      <View className="mx-4 mt-2 flex-row items-center justify-between gap-2">
+    <View className={cn(`w-full border-t border-stone-100 ${getMarginBottom()}`)}>
+      <View
+        className={cn(
+          `mx-4 my-2 flex-row items-center justify-between gap-2 rounded-full border border-stone-200 bg-white p-2 ${
+            isInputFocused ? 'border-orange-500' : ''
+          }`
+        )}>
         <PhotoPicker />
         <Input
+          onFocus={() => setInputFocused(true)}
+          onBlur={() => setInputFocused(false)}
           ref={inputRef}
           style={{ flex: 1 }}
           onChangeText={(text) => setMessage(text)}
@@ -139,6 +185,7 @@ const InputArea = () => {
           <Ionicons name="send" size={24} color={'white'} />
         </TouchableOpacity>
       </View>
-    </>
+      <ImagePreviewer />
+    </View>
   );
 };

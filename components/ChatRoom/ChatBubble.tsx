@@ -11,13 +11,20 @@ import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { ChatBubbleSendStatus } from './ChatBubbleSendStatus';
 import { AspectRatio } from '../Common/AspectRatio';
 import { defaultAnimationSettings } from '../ui/animation';
+import { useHasStayedInViewForSeconds } from '~/lib/hooks/useHasStayedInViewForSeconds';
 
-const BubbleColor = {
+const BubbleDefaultColor = {
   user: 'bg-blue-100',
   other: 'bg-gray-100',
 };
 
+const BubblePressedColor = {
+  user: 'bg-blue-200',
+  other: 'bg-gray-200',
+};
+
 interface ChatBubbleProps {
+  messageId: string;
   message: string;
   isUser: boolean;
   className?: string;
@@ -25,128 +32,62 @@ interface ChatBubbleProps {
   imageUrl?: string;
   suggestions?: string[];
   isVisible: boolean;
-  onPressInterrupter?: () => void;
+  isViewed: boolean;
 }
 
 export const ChatBubble = ({ ...props }: ChatBubbleProps) => {
-  return (
-    <Pressable onLongPress={() => Alert.alert('Hello')}>
-      <ChatBubbleCore {...props} />
-    </Pressable>
-  );
-};
-
-const useHasStayedInView = (isVisible: boolean) => {
-  const [isViewed, setIsViewed] = useState(false);
-  const visibilityTimer = useRef<NodeJS.Timeout>();
-  useEffect(() => {
-    if (isVisible && !isViewed) {
-      // Start timer when message becomes visible
-      visibilityTimer.current = setTimeout(() => {
-        setIsViewed(true);
-        // Here you can also call an API or dispatch an action to mark the message as viewed
-      }, 2000);
-    } else if (!isVisible && !isViewed) {
-      // Clear timer if message goes out of view before 3 seconds
-      if (visibilityTimer.current) {
-        clearTimeout(visibilityTimer.current);
-      }
-    }
-
-    return () => {
-      if (visibilityTimer.current) {
-        clearTimeout(visibilityTimer.current);
-      }
-    };
-  }, [isVisible, isViewed]);
+  return <ChatBubbleCore {...props} />;
 };
 
 const ChatBubbleCore = ({
+  messageId,
   message,
   className,
   isUser,
   sendAtDate,
   imageUrl,
   isVisible,
-  onPressInterrupter,
+  isViewed,
 }: ChatBubbleProps) => {
   const timestamp = formatTime(sendAtDate);
 
-  const [isViewed, setIsViewed] = useState(false);
-  const visibilityTimer = useRef<NodeJS.Timeout>();
-
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const initialOpacity = useSharedValue<number>(0);
-  const rotateIcon = useSharedValue(0);
-
-  const iconAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotateIcon.value}deg` }],
+  const [thisIsViewed, setThisIsViewed] = useState(isViewed);
+  const [bubbleColor, setBubbleColor] = useState(
+    isUser ? BubbleDefaultColor.user : BubbleDefaultColor.other
+  );
+  const scale = useSharedValue(1);
+  const bubbleAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
   }));
-
-  const handlePress = () => {
-    rotateIcon.value = withSpring(showSuggestions ? 0 : 180, defaultAnimationSettings);
-    setShowSuggestions(!showSuggestions);
-    onPressInterrupter?.();
-  };
-
-  const animatedStyles = useAnimatedStyle(() => ({
-    opacity: withDelay(1000, withTiming(initialOpacity.value + 1, { duration: 1000 })),
-  }));
-
-  useEffect(() => {
-    if (isVisible && !isViewed) {
-      // Start timer when message becomes visible
-      visibilityTimer.current = setTimeout(() => {
-        setIsViewed(true);
-        // Here you can also call an API or dispatch an action to mark the message as viewed
-      }, 2000);
-    } else if (!isVisible && !isViewed) {
-      // Clear timer if message goes out of view before 3 seconds
-      if (visibilityTimer.current) {
-        clearTimeout(visibilityTimer.current);
-      }
-    }
-
-    return () => {
-      if (visibilityTimer.current) {
-        clearTimeout(visibilityTimer.current);
-      }
-    };
-  }, [isVisible, isViewed]);
+  useHasStayedInViewForSeconds(isVisible, 2, () => setThisIsViewed(true), [thisIsViewed]);
 
   return (
     <View
       className={cn('my-3', isUser ? 'items-end pl-3 pr-2' : 'items-start pl-2 pr-3', className)}>
-      <ChatBubbleHeader isUser={isUser} timestamp={timestamp} isViewed={isViewed} />
-      <View
-        className={cn(
-          'max-w-[95%] rounded-2xl p-3',
-          isUser ? `rounded-tr-sm ${BubbleColor.user}` : `rounded-tl-sm ${BubbleColor.other}`
-        )}>
-        <Text className="text-lg text-black">{message}</Text>
-
-        {imageUrl && <ChatBubbleImage imageUrl={imageUrl} />}
-
-        <Pressable
-          className={cn(
-            'absolute -bottom-2',
-            isUser ? '-left-2' : '-right-2',
-            'rounded-full bg-slate-200 p-1'
-          )}
-          onPress={handlePress}>
-          <Animated.View style={iconAnimatedStyle}>
-            <Ionicons name="chevron-down" size={10} color="white" />
-          </Animated.View>
-        </Pressable>
-      </View>
-
-      {showSuggestions && (
+      <ChatBubbleHeader isUser={isUser} timestamp={timestamp} isViewed={thisIsViewed} />
+      <Pressable
+        onPress={() => {
+          Alert.alert('Hello');
+        }}
+        onPressIn={() => {
+          setBubbleColor(isUser ? BubblePressedColor.user : BubblePressedColor.other);
+          scale.value = withSpring(0.97, defaultAnimationSettings);
+        }}
+        onPressOut={() => {
+          setBubbleColor(isUser ? BubbleDefaultColor.user : BubbleDefaultColor.other);
+          scale.value = withSpring(1, defaultAnimationSettings);
+        }}>
         <Animated.View
-          style={animatedStyles}
-          className={cn(isUser ? 'items-end' : 'items-start', 'mt-1')}>
-          <ChatSuggestions suggestions={['abc', 'def', 'ghi']} />
+          style={bubbleAnimatedStyle}
+          className={cn(
+            'max-w-[95%] rounded-2xl p-3',
+            isUser ? `rounded-tr-sm ${bubbleColor}` : `rounded-tl-sm ${bubbleColor}`
+          )}>
+          <Text className="text-lg text-black">{message}</Text>
+
+          {imageUrl && <ChatBubbleImage imageUrl={imageUrl} />}
         </Animated.View>
-      )}
+      </Pressable>
     </View>
   );
 };

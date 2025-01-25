@@ -1,29 +1,58 @@
 import { create } from 'zustand';
 
+interface ImageProperties {
+  uri: string;
+  height: number;
+  width: number;
+  type?: string;
+  fileSize?: number;
+}
+
 interface MessageStore {
-  // Message state
+  // Flattened state
   message: string;
+  imageUri: string | null;
+  imageHeight: number | null;
+  imageWidth: number | null;
+  imageType: string | null;
+  imageFileSize: number | null;
+
+  // Actions
   setMessage: (message: string) => void;
   clearMessage: () => void;
-
-  // Image state
-  selectedImage: string | null;
-  setSelectedImage: (image: string | null) => void;
-
-  // Reset all state
+  setImageProperties: (image: ImageProperties | null) => void;
   reset: () => void;
 }
 
 export const useMessageStore = create<MessageStore>((set) => ({
-  // Message handlers
+  // Flattened state
   message: '',
+  imageUri: null,
+  imageHeight: null,
+  imageWidth: null,
+  imageType: null,
+  imageFileSize: null,
+
+  // Actions
   setMessage: (message) => set({ message }),
   clearMessage: () => set({ message: '' }),
 
-  // Image handlers
-  selectedImage: null,
-  setSelectedImage: (image) => set({ selectedImage: image }),
+  setImageProperties: (image) =>
+    set({
+      imageUri: image?.uri || null,
+      imageHeight: image?.height || null,
+      imageWidth: image?.width || null,
+      imageType: image?.type || null,
+      imageFileSize: image?.fileSize || null,
+    }),
 
-  // Reset everything
-  reset: () => set({ message: '', selectedImage: null }),
+  reset: () =>
+    set({
+      message: '',
+      imageUri: null,
+      imageHeight: null,
+      imageWidth: null,
+      imageType: null,
+      imageFileSize: null,
+    }),
 }));

@@ -29,15 +29,4 @@ export const ChatBubbleSendStatus = ({
         <Ionicons name="checkmark-circle" size={18} color={isViewed ? 'green' : 'gray'} />
       </View>
     );
-  return (
-    <View className="relative">
-      {/* is sent */}
-      <Ionicons name="checkmark-circle" size={18} color={getBubbleStatusColor(sendStatus)} />
-
-      <View className="absolute -right-[16px]">
-        {/* is read */}
-        <Ionicons name="checkmark-circle" size={18} color={isViewed ? 'green' : 'gray'} />
-      </View>
-    </View>
-  );
 };
