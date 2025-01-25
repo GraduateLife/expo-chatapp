@@ -1,214 +1,348 @@
-import { FlatList, View, TouchableOpacity } from 'react-native';
+import { FlatList, View, TouchableOpacity, Text, Pressable, Keyboard } from 'react-native';
 import { ChatBubble } from './ChatBubble';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, useCallback, useEffect } from 'react';
 import Ionicons from '@expo/vector-icons/build/Ionicons';
-
 import { useScrollToBottom } from '~/lib/hooks/useScrollToBottom';
-
+import { formatDay, isSystemMessage } from '../ui/utils';
+import { useListItemIsVisible } from '~/lib/hooks/useListItemIsVisible';
+import { useInputStore } from '~/store/inputStore';
+//TODO: ugly code
 const mockMessages = [
   {
-    userId: '9843c195-0f6e-4f2e-8b6a-3b1b0f20ecac',
-    message:
-      'Administratio suggero acquiro quas adopto dolorum. Bellum aspicio crapula demitto congregatio attonbitus. Antiquus cruciamentum ascisco desidero tunc quibusdam totam amplus repellat aspernatur.',
+    messageId: '123',
+    userId: '$system',
+    message: '123456',
     isUser: false,
-    timestamp: '2025-01-23T15:43:51.612Z',
+    isViewed: false,
+    timestamp: '2025-01-24T08:45:30.423Z',
   },
   {
-    userId: '06bfe2bc-358a-4b12-befb-99f3b76a814c',
+    messageId: '29bacc6a-840a-48bc-873b-bc90ca7f73b1',
+    userId: '444cf7cf-2b9c-4efb-99d3-1256449a74fa',
     message:
-      'Quo tego spiculum unde calculus voluptatem caput trans. Vaco tondeo tamquam vaco. Absorbeo vulnero cursim amicitia vestrum summisse.',
-    isUser: true,
-    timestamp: '2025-01-24T08:10:01.300Z',
-  },
-  {
-    userId: '6f878ddd-e0bf-4e6e-9f9e-663f481a0edd',
-    message:
-      'Amplus alter utilis cervus torrens ustilo copiose. Amoveo perspiciatis odio vestigium damnatio appositus tempore audeo acidus. Delicate depulso vobis temeritas.',
-    isUser: true,
-    timestamp: '2025-01-24T00:29:51.133Z',
-  },
-  {
-    userId: 'd31367fd-b5e2-4bf5-8989-e92debc8a2f9',
-    message:
-      'Suppellex delinquo cura tibi thesaurus tergum tollo thalassinus arto. Utique adsidue desparatus confero aeneus curso cetera dedico. Aspicio autus vehemens comptus adulescens mollitia abduco conventus aliquam degero.',
-    isUser: true,
-    timestamp: '2025-01-23T15:59:43.346Z',
-  },
-  {
-    userId: 'e00435db-a752-40ce-825f-d723764852e3',
-    message:
-      'Abutor cogo statua vinum animus. Vito aggredior accendo subnecto valens aeneus caelum amplitudo. Avarus depereo arcesso.',
-    isUser: true,
-    timestamp: '2025-01-24T07:23:10.482Z',
-  },
-  {
-    userId: 'fe6a2afe-626b-412e-b3d4-f0a511df3cd4',
-    message:
-      'Civis antiquus tibi cumque contigo sortitus. Subnecto articulus defaeco sumptus delego verbum deleniti derelinquo theologus suppellex. Quas atavus desidero infit pectus crudelis.',
+      'Votum concido adulatio caecus. Vos adopto dolores. Reprehenderit textor traho abutor appono patior.',
     isUser: false,
-    timestamp: '2025-01-23T21:46:07.078Z',
+    isViewed: false,
+    timestamp: '2025-01-24T08:45:30.423Z',
   },
   {
-    userId: '6304dae1-c5b9-47c5-9c4d-c6aba2b6361b',
+    messageId: 'dfd3c411-7665-43f6-8191-28cfe1fd7268',
+    userId: '1cee15ee-5e79-454d-94e4-1f569729b455',
     message:
-      'Patria argentum sursum appositus cognomen pauci. Audio tenuis verto. Sollers astrum adiuvo spero ago stultus.',
+      'Adhaero tot decumbo dapifer surgo vester claustrum conitor vulpes. Desparatus abeo turba magni. Consectetur summisse vomer nesciunt caries admiratio minus tenax atque debitis.',
     isUser: true,
-    timestamp: '2025-01-24T06:51:45.700Z',
-    imageUrl: 'https://loremflickr.com/377/2817?lock=7952897993557325',
+    isViewed: false,
+    timestamp: '2025-01-25T00:06:08.049Z',
+    imageUrl: 'https://loremflickr.com/3424/3832?lock=942570571021449',
   },
   {
-    userId: '2c235c4e-19a8-42de-86ba-db2dca091905',
+    messageId: '0766f16c-6de8-470f-ab03-ab96d6252aaa',
+    userId: 'b1114e96-cfba-4bf0-afec-687b8c189867',
     message:
-      'Basium depromo correptius illo tactus suscipit tollo taceo utrimque. Carpo cui vinum clementia demergo. Theca nisi solitudo suffoco avaritia rem.',
+      'Anser astrum verbum eligendi administratio. Censura asporto solum. Chirographum spes agnitio tantum tunc assumenda dedecor cinis.',
+    isUser: false,
+    isViewed: false,
+    timestamp: '2025-01-25T00:28:52.319Z',
+  },
+  {
+    messageId: '47e5917c-63df-4c2c-80b9-77074567ff89',
+    userId: '4398e76b-5778-4e3b-a526-6820a9c184dc',
+    message:
+      'Conatus amissio video cursim canonicus adulescens blanditiis. Attollo cibo cavus auctor at alo dolores sapiente vilitas. Aveho tollo alius carus teneo conforto.',
+    isUser: false,
+    isViewed: false,
+    timestamp: '2025-01-24T13:52:22.199Z',
+  },
+  {
+    messageId: 'e937b0b1-4541-4f5e-861f-b073d007ada4',
+    userId: '537640c3-6fd2-4771-9dce-58eb56e82f13',
+    message:
+      'Vorago vallum adulescens bene triumphus cupio cunabula. Ocer expedita thesaurus absens tergiversatio ascisco ademptio. Curiositas terminatio adiuvo abeo cubicularis ultra denique.',
+    isUser: false,
+    isViewed: false,
+    timestamp: '2025-01-25T04:26:34.583Z',
+    imageUrl: 'https://loremflickr.com/3159/1949?lock=3840849955991567',
+  },
+  {
+    messageId: '100ab8d6-9f54-48b2-8e55-1139567fc4ce',
+    userId: '86020067-6990-406f-bb7b-2cfab7ae2630',
+    message:
+      'Dolorum termes quaerat vulariter cunabula deduco avaritia. Theatrum benigne consequuntur quibusdam verus. Addo abutor capillus decipio nulla vox copia agnitio crapula.',
     isUser: true,
-    timestamp: '2025-01-24T08:22:44.024Z',
-    imageUrl: 'https://loremflickr.com/207/604?lock=4307847980677638',
+    isViewed: false,
+    timestamp: '2025-01-24T16:10:07.345Z',
   },
   {
-    userId: 'efc5cd63-b740-4036-8d66-538537bf4bdc',
+    messageId: '73f248c6-3afc-458c-854c-685d852e5e99',
+    userId: 'e3e3fab2-aa6e-44ce-8e57-8328d55c8c84',
     message:
-      'Acerbitas denuo enim validus pecto corona ascit termes cruentus suadeo. Capio cometes desparatus pauper nulla tabernus aurum congregatio itaque. Supplanto tardus canto volutabrum campana conspergo.',
+      'Cotidie cunae assumenda vomer coepi soleo vel maxime deludo. Summa colligo administratio coniecto consectetur autem urbanus. Omnis caterva deleniti possimus armarium tener cubo.',
+    isUser: false,
+    isViewed: false,
+    timestamp: '2025-01-25T05:03:27.413Z',
+  },
+  {
+    messageId: 'b7f1a3de-02f5-488d-8b86-370ab39bb3b8',
+    userId: '904f8751-d29e-48a0-b8b1-1d2144df6686',
+    message:
+      'Thorax deleo similique sit suscipit tendo audio ubi. Alo crepusculum delego strenuus. Ocer culpa capillus.',
+    isUser: false,
+    isViewed: false,
+    timestamp: '2025-01-25T03:43:26.610Z',
+    imageUrl: 'https://picsum.photos/seed/Go3x4lFy/2334/1502',
+  },
+  {
+    messageId: '9f366334-348a-49a6-ac4a-8bfde159d27b',
+    userId: 'de2bf42d-582c-4482-b22a-26e365cbe960',
+    message:
+      'Viriliter soleo conventus adinventitias. Copiose bellum antea. Contigo vito comburo defaeco ager cupiditas ciminatio.',
+    isUser: false,
+    isViewed: false,
+    timestamp: '2025-01-24T11:25:15.554Z',
+  },
+  {
+    messageId: '07c00bdf-736e-4ecb-8e8c-c43146cc6c87',
+    userId: '4476abc6-e746-4f61-9910-fc1abf5be0d0',
+    message:
+      'Veritas absconditus sollers ademptio clam sono crustulum ars. Territo verbera bibo uterque soluta somniculosus sum. Cura dignissimos terebro aequus adulescens.',
+    isUser: false,
+    isViewed: false,
+    timestamp: '2025-01-24T13:16:13.883Z',
+    imageUrl: 'https://picsum.photos/seed/39JyUmSlw/2566/782',
+  },
+  {
+    messageId: '78838cef-69c2-4e24-87d3-30fcd955ad96',
+    userId: '08fcc3a4-6d42-490a-80df-9482f5e63379',
+    message:
+      'Ver angulus termes distinctio. Tollo adeo addo voluptate tres vehemens vinitor caveo adamo clibanus. Pectus cupio timidus accusator argentum pel corroboro similique contabesco utrum.',
+    isUser: false,
+    isViewed: false,
+    timestamp: '2025-01-24T08:47:37.036Z',
+    imageUrl: 'https://loremflickr.com/2144/3418?lock=1583720674124591',
+  },
+  {
+    messageId: '3bede3eb-8417-4a86-989f-2a044c549ff9',
+    userId: '91606456-00de-4717-8a42-9d39e8a4e816',
+    message:
+      'Ara sollicito officiis argumentum. Admiratio repellat sordeo aliqua. Vos repellendus vesica concido trans contra solitudo.',
+    isUser: false,
+    isViewed: false,
+    timestamp: '2025-01-25T02:43:17.088Z',
+    imageUrl: 'https://loremflickr.com/100/3732?lock=2203678176694225',
+  },
+  {
+    messageId: '4aeef164-7142-4b2b-8381-888c3b57a83f',
+    userId: 'aa146b1f-ffb4-47eb-9b24-d4b7c0b399f9',
+    message:
+      'Dolor antepono confido amet bestia labore clarus templum sint. Adipisci volaticus damno verecundia. Summa acidus cruciamentum contego temperantia.',
+    isUser: false,
+    isViewed: false,
+    timestamp: '2025-01-24T09:18:33.358Z',
+  },
+  {
+    messageId: 'f49bf37a-e7df-4d70-a51d-f9bbd65fb7b3',
+    userId: 'edfccca9-18d1-42fc-abe2-1639c391385b',
+    message:
+      'Carus attollo truculenter spes aeneus spiritus cariosus cresco. Venia bestia summa caelum. Aegre beatae aliquam saepe solitudo.',
     isUser: true,
-    timestamp: '2025-01-23T20:29:23.370Z',
+    isViewed: false,
+    timestamp: '2025-01-24T06:25:07.041Z',
   },
   {
-    userId: '85f7c7b9-63c0-4d5f-a67d-9eb7509eb390',
+    messageId: '50138707-e7f4-4651-9645-41cffd1d2256',
+    userId: '102df95f-3d65-4f52-99b3-5d84176f6b76',
     message:
-      'Acquiro aureus architecto arto decipio vesco aliquam derideo defessus vere. Depopulo traho cito vulgo curvo bestia depulso. Uberrime inventore laborum angustus civitas charisma aurum velut candidus.',
-    isUser: false,
-    timestamp: '2025-01-23T14:34:34.807Z',
-    imageUrl: 'https://loremflickr.com/2425/2620?lock=7614149007492012',
-  },
-  {
-    userId: '27699f09-759c-4550-9cc8-0564ffbadacb',
-    message:
-      'Suggero tamisium totidem. Ulciscor vilis in cognomen dedecor. Volaticus delectus comburo tripudio absum distinctio.',
-    isUser: false,
-    timestamp: '2025-01-23T21:21:06.246Z',
-  },
-  {
-    userId: 'b7d7f02c-5cfc-4716-92f9-e6faded3661a',
-    message:
-      'Praesentium comparo cunabula utique demoror laborum. Desipio turbo sortitus agnosco. Cupiditas sum virga sordeo ullus.',
-    isUser: false,
-    timestamp: '2025-01-24T09:50:57.623Z',
-  },
-  {
-    userId: 'cd0a4917-6809-4f21-b53c-4f0c294ca402',
-    message:
-      'Omnis inventore accusamus. Suppellex creta delinquo. Libero labore aperio candidus thermae sub adicio.',
-    isUser: false,
-    timestamp: '2025-01-24T09:35:51.769Z',
-  },
-  {
-    userId: '341da6a4-8a0c-4bf7-b164-1a6a25b519a6',
-    message:
-      'Contego concido illum voco thorax claro. Voluntarius venia conforto tendo. Corporis tero auxilium statim iure solio sperno ut ubi eius.',
+      'Charisma depulso tamisium eos solio cilicium. Aduro in defaeco valeo curso culpo delectatio. Advoco advoco earum ventito atqui arbitro amplitudo tot autus.',
     isUser: true,
-    timestamp: '2025-01-24T01:20:52.853Z',
-    imageUrl: 'https://picsum.photos/seed/CH0X6YpBrJ/3028/3733',
+    isViewed: false,
+    timestamp: '2025-01-24T07:22:38.210Z',
   },
   {
-    userId: '7ea2860f-4262-4934-b9f4-06d085e036ce',
-    message: 'Aegrotatio torrens demo. Adulatio dolor celer. Carbo subnecto valens corporis vae.',
+    messageId: 'a3d2707d-4386-4ec7-a844-402f38f16aa5',
+    userId: '5d20b26e-5af2-401d-8289-9c7c86051150',
+    message:
+      'Bibo patruus averto tamquam adsum tepesco claustrum. Cupressus usque ratione ait virtus vilicus urbanus suspendo collum. Admiratio textor volva auctus colligo.',
+    isUser: false,
+    isViewed: false,
+    timestamp: '2025-01-25T03:50:33.502Z',
+  },
+  {
+    messageId: '2555954f-a214-4958-8f72-20faa5f6937f',
+    userId: '1a5dcb2f-3aae-4ce6-a2f2-d8ef586efbc3',
+    message:
+      'Patruus tantillus certus convoco thema. Terra compello numquam. Defungo basium dens maiores rem usitas uterque adopto acer.',
+    isUser: false,
+    isViewed: false,
+    timestamp: '2025-01-24T08:14:29.345Z',
+  },
+  {
+    messageId: '955a7755-2cd6-4d65-b6e1-e03e42bc70ba',
+    userId: 'cc1ccd9d-cf4d-49e6-b176-31b3b4f0aa97',
+    message:
+      'Constans uberrime conculco laudantium. Delego aggero cervus caveo creator. Amiculum decerno unde adipisci vereor.',
     isUser: true,
-    timestamp: '2025-01-24T03:55:54.285Z',
+    isViewed: false,
+    timestamp: '2025-01-24T06:30:44.184Z',
+    imageUrl: 'https://loremflickr.com/2223/3676?lock=946832043126570',
   },
   {
-    userId: 'c607578b-7f91-4f5f-b704-a0e3411068a8',
+    messageId: 'dd9c2541-656d-484a-946b-9c99e8dccdd9',
+    userId: '18f02472-513e-4d22-bf08-b14cf4f72f58',
     message:
-      'Delectatio delectatio contabesco peior tepesco damno. Terra terreo arcus currus. Carus ager suadeo apud.',
+      'Utor bonus supellex. Cupressus totidem vespillo corporis astrum. Ademptio blandior tantillus.',
     isUser: false,
-    timestamp: '2025-01-23T19:51:35.154Z',
+    isViewed: false,
+    timestamp: '2025-01-24T15:50:45.531Z',
   },
   {
-    userId: '616701a4-12f2-46df-9c34-340fce734899',
+    messageId: '9975d509-48a4-4ad1-8143-1187968b8ed9',
+    userId: '7ff7e938-60c1-4c05-a928-c222e0c98ccb',
     message:
-      'Cognatus totus blandior. Benevolentia spoliatio chirographum vilis aveho averto. Decet terra vox succurro admiratio.',
-    isUser: true,
-    timestamp: '2025-01-23T16:19:36.174Z',
-  },
-  {
-    userId: 'd5ad908c-7089-471b-a650-b23a5d841ed9',
-    message:
-      'Surculus deleo usitas volutabrum adicio odio vorago voluptatem. Considero spero arca sit arbitro basium sustineo sumptus videlicet. Barba basium pax alter.',
+      'Fuga validus decens peccatus tamquam solio cavus ustulo aeneus. Appello comminor carus vilitas amicitia conscendo consequatur uredo virga. Nulla eius tenetur ait.',
     isUser: false,
-    timestamp: '2025-01-24T00:16:13.427Z',
-  },
-  {
-    userId: '7b17ad3a-3818-479c-8ad9-76b342f7363d',
-    message:
-      'Vita surgo conservo despecto deleo quibusdam antea spiritus vestigium aliquid. Ager vilicus officiis ante adiuvo vero acidus clementia cruentus. Fuga cenaculum timor tergum absque absens.',
-    isUser: false,
-    timestamp: '2025-01-23T21:09:35.683Z',
-  },
-  {
-    userId: '57e30c8a-3c05-494d-ba57-4c857d797190',
-    message:
-      'Vero alius dens corona porro. Texo succedo textor agnitio adsuesco aetas crepusculum beatae. Denique adimpleo canonicus assentator vitae contego voro attonbitus.',
-    isUser: false,
-    timestamp: '2025-01-23T19:42:46.789Z',
+    isViewed: true,
+    timestamp: '2025-01-25T04:05:24.854Z',
   },
 ];
-
-const useListItemIsVisible = ({
-  visiblePercentage = 100,
-  minimumViewTime = 100,
-}: {
-  visiblePercentage: number;
-  minimumViewTime: number;
-}) => {
-  const viewabilityConfig = useMemo(
-    () => ({
-      viewAreaCoveragePercentThreshold: visiblePercentage,
-      minimumViewTime: minimumViewTime,
-    }),
-    []
-  );
-  const [visibleIds, setVisibleIds] = useState<string[]>([]);
-
-  const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: Array<any> }) => {
-    const visibleIds = viewableItems.map((item) => item.item.userId + item.item.timestamp);
-    setVisibleIds(visibleIds);
-  }).current;
-
-  return { visibleIds, onViewableItemsChanged, viewabilityConfig };
-};
 
 export const Conversation = () => {
   const messages = useMemo(() => mockMessages, [mockMessages]);
   const { listRef, isAtBottom, onScrollListener, scrollToBottom } = useScrollToBottom();
   const { visibleIds, onViewableItemsChanged, viewabilityConfig } = useListItemIsVisible({
+    keyExtractorField: 'messageId',
     visiblePercentage: 100,
-    minimumViewTime: 100,
   });
+  const { isInputFocused, setInputFocused } = useInputStore();
+  const lastScrollY = useRef(0);
+  const lastScrollTime = useRef(Date.now());
+
+  // Add gesture handler for scroll
+  const handleScroll = useCallback(
+    (event: any) => {
+      const currentY = event.nativeEvent.contentOffset.y;
+      const currentTime = Date.now();
+      const deltaY = currentY - lastScrollY.current;
+      const deltaTime = currentTime - lastScrollTime.current;
+
+      // Calculate velocity (pixels per millisecond)
+      const velocity = deltaTime > 0 ? deltaY / deltaTime : 0;
+      // If scrolling up (positive velocity) and input is focused, unfocus it
+      // Adjust the threshold value (0.5) as needed
+      if (velocity < -0.5 && isInputFocused) {
+        setInputFocused(false);
+        Keyboard.dismiss();
+      }
+
+      lastScrollY.current = currentY;
+      lastScrollTime.current = currentTime;
+    },
+    [isInputFocused, setInputFocused]
+  );
+
+  useEffect(() => {
+    if (isInputFocused) {
+      scrollToBottom();
+    }
+  }, [isInputFocused, scrollToBottom]);
+
+  // Clean up throttle on unmount
+
+  const scrollToMessageId = useCallback(
+    (messageId: string) => {
+      const messageIndex = messages.findIndex((msg) => msg.messageId === messageId);
+      if (messageIndex !== -1) {
+        listRef.current?.scrollToIndex({
+          index: messageIndex,
+          animated: true,
+          viewPosition: 0.5,
+          viewOffset: 0,
+        });
+      }
+    },
+    [messages]
+  );
+
+  const onScrollToIndexFailed = useCallback(
+    (info: { index: number; highestMeasuredFrameIndex: number; averageItemLength: number }) => {
+      listRef.current?.scrollToOffset({
+        offset: info.averageItemLength * info.index,
+        animated: false,
+      });
+
+      setTimeout(() => {
+        if (listRef.current) {
+          listRef.current.scrollToIndex({
+            index: info.index,
+            animated: true,
+            viewPosition: 0.5,
+          });
+        }
+      }, 100);
+    },
+    []
+  );
 
   return (
-    <View className="relative flex-1">
+    <View>
       <FlatList
         ref={listRef}
-        onScroll={onScrollListener}
+        onScroll={(e) => {
+          onScrollListener(e);
+          handleScroll(e);
+        }}
         viewabilityConfig={viewabilityConfig}
         onViewableItemsChanged={onViewableItemsChanged}
         data={messages}
-        renderItem={({ item }) => (
-          <ChatBubble
-            key={item.userId + item.timestamp}
-            message={item.message}
-            isUser={item.isUser}
-            imageUrl={item.imageUrl}
-            sendAtDate={new Date(item.timestamp)}
-            isVisible={visibleIds.includes(item.userId + item.timestamp)}
-          />
+        onScrollToIndexFailed={onScrollToIndexFailed}
+        renderItem={({ item, index }) => (
+          <>
+            {isSystemMessage(item) ? (
+              <SystemMessage message={item.message} />
+            ) : (
+              <ChatBubble
+                key={item.messageId}
+                messageId={item.messageId}
+                message={item.message}
+                isUser={item.isUser}
+                imageUrl={item.imageUrl}
+                sendAtDate={new Date(item.timestamp)}
+                isViewed={item.isViewed}
+                isVisible={visibleIds.includes(item.messageId)}
+              />
+            )}
+          </>
         )}
       />
-      {!isAtBottom && (
+
+      {!isAtBottom ? (
         <TouchableOpacity
           onPress={scrollToBottom}
-          className="absolute bottom-4 right-4 rounded-full bg-blue-500 p-1">
-          <Ionicons name="chevron-down" size={12} color={'white'} />
+          className="absolute bottom-4 right-4 rounded-full bg-white/80 p-2">
+          <Ionicons name="chevron-down" size={22} color={'gray'} />
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          onPress={() => scrollToMessageId('123')}
+          className="absolute bottom-4 right-4 rounded-full bg-white/80 p-2">
+          <Ionicons name="chevron-up" size={22} color={'gray'} />
         </TouchableOpacity>
       )}
     </View>
   );
 };
+
+const SystemMessage = ({ message }: { message: string }) => {
+  return (
+    <View>
+      <Text className="text-center text-gray-500">{message}</Text>
+    </View>
+  );
+};
+
+{
+  /* <TouchableOpacity
+onPress={() => scrollToMessage('9975d509-48a4-4ad1-8143-1187968b8ed9')}
+className="absolute bottom-12 right-4 rounded-full bg-white/80 p-2">
+<Ionicons name="play" size={22} color={'gray'} />
+</TouchableOpacity> */
+}

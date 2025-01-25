@@ -1,10 +1,19 @@
 import React, { ReactNode } from 'react';
 import { View, ViewStyle, Image, Pressable, Linking } from 'react-native';
-import { cn } from '../ui/utils';
+import { AspectRatioType, cn } from '../ui/utils';
 import { Toast, useToastController } from '@tamagui/toast';
 
+export const aspectRatioToNumber = (ratio: AspectRatioType): number => {
+  const ratioMap = {
+    '1:1': 1,
+    '16:9': 16 / 9,
+    '4:3': 4 / 3,
+  };
+  return ratioMap[ratio];
+};
+
 interface AspectRatioProps {
-  ratio?: number;
+  ratio?: AspectRatioType | number;
   children?: ReactNode;
   className?: string;
   style?: ViewStyle;
@@ -13,12 +22,15 @@ interface AspectRatioProps {
 }
 
 export const AspectRatio: React.FC<AspectRatioProps> = ({
-  ratio = 1, // Default 1:1 ratio
+  ratio,
   children,
   className,
   style,
   imageUrl,
 }) => {
+  if (typeof ratio === 'string') {
+    ratio = aspectRatioToNumber(ratio);
+  }
   if (imageUrl) {
     return (
       <View className={className}>

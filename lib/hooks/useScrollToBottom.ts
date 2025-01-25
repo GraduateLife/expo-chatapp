@@ -13,7 +13,7 @@ export const useScrollToBottom = () => {
   const listRef = useRef<FlatList>(null);
   const onScrollListener = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-    const paddingToBottom = 20;
+    const paddingToBottom = 25;
     const isCloseToBottom =
       layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
 
