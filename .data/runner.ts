@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { MessageMocker } from './MessageMocker';
 
 const OUTPUT_DIR = '.data/seed';
 
@@ -17,7 +16,10 @@ function writeJsonToFile(filename: string, data: any): void {
   console.log(`Generated ${filePath}`);
 }
 
-export function generateMockData(fn: () => void, descriptionFileName: string): void {
+export function generateMockData(
+  fn: () => void,
+  descriptionFileName: string
+): void {
   writeJsonToFile(`${descriptionFileName}.json`, fn());
 }
 

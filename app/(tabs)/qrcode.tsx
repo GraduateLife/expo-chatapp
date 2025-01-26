@@ -1,8 +1,9 @@
-import { Stack } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { SafeAreaView, Text, Modal, Pressable, View, StyleSheet, Alert } from 'react-native';
-import { useModalStore } from '~/store/modal';
-import Animated, { withSpring, useAnimatedStyle, withSequence } from 'react-native-reanimated';
+import { SafeAreaView, StyleSheet, Text } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  withSequence,
+  withSpring,
+} from 'react-native-reanimated';
 
 export default function QRCode() {
   const animatedStyle = useAnimatedStyle(() => ({

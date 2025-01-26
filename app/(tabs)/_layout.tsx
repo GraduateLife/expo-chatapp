@@ -1,6 +1,11 @@
-import { AntDesign, Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Link, Stack, Tabs } from 'expo-router';
-import { View, Text } from 'react-native';
+import {
+  AntDesign,
+  Feather,
+  Ionicons,
+  MaterialCommunityIcons,
+} from '@expo/vector-icons';
+import { Stack, Tabs } from 'expo-router';
+import { View } from 'react-native';
 
 export default function MainLayout() {
   return (
@@ -11,13 +16,16 @@ export default function MainLayout() {
           tabBarActiveTintColor: '#38bdf8', //sky-400
           headerShown: false,
           tabBarInactiveTintColor: '#a1a1aa', //zinc-400
-        }}>
+        }}
+      >
         <Tabs.Screen
           name="index"
           options={{
             title: 'Chats',
 
-            tabBarIcon: ({ color }) => <Ionicons name="chatbubbles" size={24} color={color} />,
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="chatbubbles" size={24} color={color} />
+            ),
           }}
         />
         <Tabs.Screen
@@ -26,7 +34,11 @@ export default function MainLayout() {
             title: 'Contacts',
 
             tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons name="phone-outgoing" size={24} color={color} />
+              <MaterialCommunityIcons
+                name="phone-outgoing"
+                size={24}
+                color={color}
+              />
             ),
           }}
         />
@@ -47,14 +59,18 @@ export default function MainLayout() {
           name="saves"
           options={{
             title: 'Saves',
-            tabBarIcon: ({ color }) => <Feather name="box" size={24} color={color} />,
+            tabBarIcon: ({ color }) => (
+              <Feather name="box" size={24} color={color} />
+            ),
           }}
         />
         <Tabs.Screen
           name="account"
           options={{
             title: 'Account',
-            tabBarIcon: ({ color }) => <AntDesign name="setting" size={24} color={color} />,
+            tabBarIcon: ({ color }) => (
+              <AntDesign name="setting" size={24} color={color} />
+            ),
           }}
         />
       </Tabs>

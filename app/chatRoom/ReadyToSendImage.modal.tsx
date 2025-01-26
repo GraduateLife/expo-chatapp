@@ -1,13 +1,23 @@
-import { View, Text, TextInput, KeyboardAvoidingView, Keyboard, Pressable } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Image } from 'react-native';
+import { Button, Input } from '@ui-kitten/components';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import {
+  Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Pressable,
+  Text,
+  View,
+} from 'react-native';
+
 import { AspectRatio } from '~/components/Common/AspectRatio';
-import { Input, Button } from 'tamagui';
-import { useState, useEffect } from 'react';
 
 export default function ReadyToSendImageModal() {
   const router = useRouter();
-  const { image, contactId } = useLocalSearchParams() as { image: string; contactId: string };
+  const { image, contactId } = useLocalSearchParams() as {
+    image: string;
+    contactId: string;
+  };
   const [message, setMessage] = useState<string>('');
 
   useEffect(() => {
@@ -29,7 +39,9 @@ export default function ReadyToSendImageModal() {
             <Image source={{ uri: image }} className="h-full" />
           </AspectRatio>
           <Text className="text-md m-4">Send to {contactId}</Text>
-          <Text className="text-md m-4">Do you want say something about it?</Text>
+          <Text className="text-md m-4">
+            Do you want say something about it?
+          </Text>
           <Input
             multiline
             numberOfLines={message.length > 30 ? 2 : undefined}

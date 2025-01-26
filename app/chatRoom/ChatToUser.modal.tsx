@@ -1,5 +1,5 @@
-import { View, Text } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Text, View } from 'react-native';
 
 export default function ChatToUserModal() {
   const router = useRouter();

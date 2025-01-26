@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import { cn } from '../ui/utils';
 
 type ChatBubbleInfoProps = Contact & {
@@ -39,13 +39,23 @@ export const ChatBubbleInfo = ({
           />
         ) : (
           <View
-            className={cn('items-center justify-center rounded-full bg-yellow-300')}
-            style={{ width: 40, height: 40 }}>
-            <Text className="text-lg text-gray-700">{getUserNameFirstLetter(userName)}</Text>
+            className={cn(
+              'items-center justify-center rounded-full bg-yellow-300'
+            )}
+            style={{ width: 40, height: 40 }}
+          >
+            <Text className="text-lg text-gray-700">
+              {getUserNameFirstLetter(userName)}
+            </Text>
           </View>
         )}
         <View className="absolute bottom-0 right-0">
-          <View className={cn('size-3 rounded-full', getOnlineStatusColor(onlineStatus))} />
+          <View
+            className={cn(
+              'size-3 rounded-full',
+              getOnlineStatusColor(onlineStatus)
+            )}
+          />
         </View>
       </View>
       <View className="flex-1">
