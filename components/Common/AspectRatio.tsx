@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react';
-import { View, ViewStyle, Image, Pressable, Linking } from 'react-native';
-import { AspectRatioType, cn } from '../ui/utils';
-import { Toast, useToastController } from '@tamagui/toast';
+import { Image, View, ViewStyle } from 'react-native';
+import { AspectRatioType } from '../ui/utils';
 
 export const aspectRatioToNumber = (ratio: AspectRatioType): number => {
   const ratioMap = {
@@ -55,7 +54,8 @@ export const AspectRatio: React.FC<AspectRatioProps> = ({
           aspectRatio: ratio,
           overflow: 'hidden',
         },
-      ]}>
+      ]}
+    >
       {children}
     </View>
   );

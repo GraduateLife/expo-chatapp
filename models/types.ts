@@ -4,16 +4,17 @@ export type Contact = {
   avatarUrl?: string;
   lastSeenDate: Date;
   signature: string;
-  onlineStatus: OnlineStatus;
+  userStatus: UserStatus;
 };
-export type OnlineStatus = 'online' | 'offline' | 'busy';
+export type UserStatus = 'online' | 'offline' | 'busy' | 'typing';
+
+export type MessageType = 'raw-text' | 'rich-text' | 'audio';
 
 export type Message = {
   messageId: string;
   userId: string;
-  message: string;
-  isUser: boolean;
-  timestamp: Date;
+  textContent: string;
+  sendAtDate: Date;
   imageUrl?: string;
   isViewed: boolean;
 };

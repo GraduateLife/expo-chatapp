@@ -15,7 +15,8 @@ export const useScrollToBottom = () => {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
     const paddingToBottom = 25;
     const isCloseToBottom =
-      layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
+      layoutMeasurement.height + contentOffset.y >=
+      contentSize.height - paddingToBottom;
 
     setIsAtBottom(isCloseToBottom);
   };

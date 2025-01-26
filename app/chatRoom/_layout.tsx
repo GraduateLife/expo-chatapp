@@ -1,6 +1,4 @@
-import { Slot, Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { Platform, Text, View } from 'react-native';
+import { Stack } from 'expo-router';
 
 export default function ChatRoomLayout() {
   return (
@@ -8,7 +6,8 @@ export default function ChatRoomLayout() {
       <Stack
         screenOptions={{
           headerShown: true,
-        }}>
+        }}
+      >
         <Stack.Screen name="[contactId]" options={{ headerShown: false }} />
         <Stack.Screen
           name="ChatToUser.modal"

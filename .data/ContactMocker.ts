@@ -8,7 +8,12 @@ export class ContactMocker {
       userName: faker.person.fullName(),
       avatarUrl: faker.image.avatar(),
       lastSeenDate: faker.date.recent(),
-      onlineStatus: faker.helpers.arrayElement(['online', 'offline', 'busy']),
+      userStatus: faker.helpers.arrayElement([
+        'online',
+        'offline',
+        'busy',
+        'typing',
+      ]),
       signature: faker.lorem.sentence(),
     };
   }
