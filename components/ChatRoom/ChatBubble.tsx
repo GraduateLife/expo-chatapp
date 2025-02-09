@@ -8,7 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useHasStayedInViewForSeconds } from '~/lib/hooks/useHasStayedInViewForSeconds';
 
-import { Message } from '~/models/types';
+import { Message } from '~/localStorage/types';
 
 import { MyUserId } from '~/Tempfile';
 import { AspectRatio } from '../Common/AspectRatio';

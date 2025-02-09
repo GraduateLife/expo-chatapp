@@ -1,5 +1,6 @@
 import React from 'react';
 import { Image, Text, View } from 'react-native';
+import { Contact, UserStatus } from '~/localStorage/types';
 import { cn } from '../ui/utils';
 
 type ChatBubbleInfoProps = Contact & {
@@ -10,8 +11,8 @@ const getUserNameFirstLetter = (userName: string) => {
   return userName.charAt(0).toUpperCase();
 };
 
-const getOnlineStatusColor = (onlineStatus: OnlineStatus) => {
-  switch (onlineStatus) {
+const getOnlineStatusColor = (userStatus: UserStatus) => {
+  switch (userStatus) {
     case 'online':
       return 'bg-green-500';
     case 'offline':
@@ -26,7 +27,7 @@ export const ChatBubbleInfo = ({
   avatarUrl,
   className,
   signature,
-  onlineStatus,
+  userStatus,
 }: ChatBubbleInfoProps) => {
   return (
     <View className={cn('flex-row items-center gap-2', className)}>
@@ -53,7 +54,7 @@ export const ChatBubbleInfo = ({
           <View
             className={cn(
               'size-3 rounded-full',
-              getOnlineStatusColor(onlineStatus)
+              getOnlineStatusColor(userStatus)
             )}
           />
         </View>

@@ -1,13 +1,18 @@
 import { faker } from '@faker-js/faker';
-import { Message } from '../models/types';
-
-const MyUserId = '$user';
+import { MyUserId } from '~/Tempfile';
+import { Message } from '../localStorage/types';
 
 export class MessageMocker {
-  static createFakeMessage(): Message {
+  static createFakeMessage(
+    withUserId?: string,
+    conversationId?: string,
+    messageId?: string
+  ): Message {
+    const targetUserId = withUserId ?? faker.string.uuid();
     return {
-      messageId: faker.string.uuid(),
-      userId: Math.random() > 0.5 ? faker.string.uuid() : MyUserId,
+      messageId: messageId ?? faker.string.uuid(),
+      userId: Math.random() > 0.5 ? targetUserId : MyUserId,
+      conversationId: conversationId ?? faker.string.uuid(),
       textContent: faker.lorem.paragraph(),
       isViewed: false,
       sendAtDate: faker.date.recent(),
@@ -15,7 +20,17 @@ export class MessageMocker {
     };
   }
 
-  static createMultipleMessages(count: number): Message[] {
-    return Array.from({ length: count }, () => this.createFakeMessage());
+  static createMultipleMessages(
+    count: number,
+    withUserId?: string,
+    conversationId?: string
+  ): Message[] {
+    // Reset lastMessageDate if startDate is provided
+
+    return Array.from({ length: count }, () =>
+      MessageMocker.createFakeMessage(withUserId, conversationId)
+    );
   }
+
+  // Reset the lastMessageDate (useful when starting a new conversation)
 }

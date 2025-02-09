@@ -1,4 +1,4 @@
-import { Stack, router } from 'expo-router';
+import { router } from 'expo-router';
 import { Image, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -7,7 +7,6 @@ import { Button } from '@ui-kitten/components';
 export default function Welcome() {
   return (
     <>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
       <View className="flex h-full w-full bg-slate-100 ">
         <SafeAreaView className="mx-auto flex h-full w-[90%] items-center justify-center">
           <Text className="font-[delius] text-6xl font-bold text-black">

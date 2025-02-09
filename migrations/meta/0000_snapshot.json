@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "98e01e07-1e5f-44cb-8157-5885482462a8",
+  "id": "243bea73-5203-4b7b-befb-fcdd140907c6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "contacts_table": {
@@ -56,6 +56,74 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "conversations_table": {
+      "name": "conversations_table",
+      "columns": {
+        "conversation_id": {
+          "name": "conversation_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_by_user": {
+          "name": "created_by_user",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at_date": {
+          "name": "created_at_date",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "last_message_id": {
+          "name": "last_message_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "archived": {
+          "name": "archived",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "conversations_table_created_by_user_contacts_table_user_id_fk": {
+          "name": "conversations_table_created_by_user_contacts_table_user_id_fk",
+          "tableFrom": "conversations_table",
+          "tableTo": "contacts_table",
+          "columnsFrom": [
+            "created_by_user"
+          ],
+          "columnsTo": [
+            "user_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "messages_table": {
       "name": "messages_table",
       "columns": {
@@ -68,6 +136,13 @@
         },
         "user_id": {
           "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "conversation_id": {
+          "name": "conversation_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -115,6 +190,19 @@
           ],
           "columnsTo": [
             "user_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "messages_table_conversation_id_conversations_table_conversation_id_fk": {
+          "name": "messages_table_conversation_id_conversations_table_conversation_id_fk",
+          "tableFrom": "messages_table",
+          "tableTo": "conversations_table",
+          "columnsFrom": [
+            "conversation_id"
+          ],
+          "columnsTo": [
+            "conversation_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"

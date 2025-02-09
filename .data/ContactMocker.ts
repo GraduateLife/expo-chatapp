@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { Contact } from '../models/types';
+import { Contact } from '../localStorage/types';
 
 export class ContactMocker {
   static createFakeContact(): Contact {
@@ -19,6 +19,8 @@ export class ContactMocker {
   }
 
   static createMultipleContacts(count: number): Contact[] {
-    return Array.from({ length: count }, () => this.createFakeContact());
+    return Array.from({ length: count }, () =>
+      ContactMocker.createFakeContact()
+    );
   }
 }
