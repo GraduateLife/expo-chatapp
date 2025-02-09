@@ -12,7 +12,9 @@ web-build/
 # expo router
 expo-env.d.ts
 
-
+.data
+pnpm-lock.yaml
+migrations
 
 ios
 android
