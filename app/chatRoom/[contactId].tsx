@@ -1,59 +1,21 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Input } from '@ui-kitten/components';
 import * as ImagePicker from 'expo-image-picker';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import {
   Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { ChatBubbleInfo } from '~/components/ChatRoom/ChatBubbleInfo';
+import { ChatRoomHeader } from '~/components/ChatRoom/ChatRoomHeader';
 import { Conversation } from '~/components/ChatRoom/Conversation';
 import { AspectRatio } from '~/components/Common/AspectRatio';
 import { cn, formatFileSize, getImageAspectRatio } from '~/components/ui/utils';
 import { useInputStore } from '~/store/inputStore';
 import { useMessageStore } from '~/store/messageStore';
-
-const Header = () => {
-  const { contactId } = useLocalSearchParams();
-  const router = useRouter();
-
-  return (
-    <View
-      className="mx-2 flex-row items-center justify-between bg-white pb-4"
-      style={{ paddingTop: Platform.OS === 'ios' ? 70 : 25 }}
-    >
-      <View className="flex-row items-center gap-2">
-        <TouchableOpacity
-          className="flex items-center justify-center rounded-full  bg-white/30 p-2"
-          onPress={() => router.back()}
-        >
-          <Ionicons name="chevron-back" size={24} color="" />
-        </TouchableOpacity>
-        <Pressable
-          className="flex-1 rounded-full border border-stone-200 bg-white/30 p-1.5"
-          onPress={() =>
-            router.push(`/chatRoom/ChatToUser.modal?contactId=${contactId}`)
-          }
-        >
-          <ChatBubbleInfo
-            userName={'Joe Done'}
-            id={contactId.toString()}
-            signature={'this is a signature'}
-            onlineStatus={'busy'}
-          />
-        </Pressable>
-      </View>
-      <StatusBar style={Platform.OS === 'ios' ? 'dark' : 'auto'} />
-    </View>
-  );
-};
 
 export default function ChatRoom() {
   return (
@@ -63,9 +25,9 @@ export default function ChatRoom() {
       keyboardVerticalOffset={0}
     >
       <View className="flex-1 bg-white">
-        <Header />
+        <ChatRoomHeader />
         <View className="flex-1">
-          <Conversation />
+          <Conversation conversationId="919df533-8155-44b7-9b77-7d1fabe68311" />
         </View>
         <View className="w-full bg-white">
           <InputArea />
@@ -151,8 +113,7 @@ const PhotoPicker = () => {
 };
 
 const InputArea = () => {
-  const { message, setMessage, imageUri, setImageProperties } =
-    useMessageStore();
+  const { message, setMessage, imageUri } = useMessageStore();
   const { isInputFocused, setInputFocused } = useInputStore();
 
   const getMarginBottom = () => {

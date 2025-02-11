@@ -3,8 +3,13 @@ import { Image, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@ui-kitten/components';
+import React from 'react';
+import { useSendPrompt } from '~/AiChat/api';
 
 export default function Welcome() {
+  const { data, error } = useSendPrompt('hi?');
+  const [response, setResponse] = React.useState<string>('');
+
   return (
     <>
       <View className="flex h-full w-full bg-slate-100 ">
@@ -18,6 +23,8 @@ export default function Welcome() {
           />
           <View className="w-full">
             <Button
+              status="success"
+              size="giant"
               onPress={() => {
                 router.push('/(auth)/login');
               }}
@@ -33,6 +40,21 @@ export default function Welcome() {
           >
             Register
           </Button>
+          <Button
+            onPress={() => {
+              if (data) {
+                setResponse(data.response);
+                console.log(data);
+              } else if (error) {
+                console.error('Error:', error);
+              }
+            }}
+          >
+            hello test
+          </Button>
+          {response && (
+            <Text className="mt-2 text-base text-gray-700">{response}</Text>
+          )}
           <Button
             onPress={() => {
               router.push('/(tabs)');

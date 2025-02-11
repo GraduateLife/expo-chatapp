@@ -3,14 +3,14 @@ import { useRef } from 'react';
 import { useEffect } from 'react';
 
 export const useHasStayedInViewForSeconds = (
-  isVisibleNow: boolean,
+  becomesVisible: Date,
   seconds: number,
   callback: () => void,
   deps: any[]
 ) => {
   const visibilityTimer = useRef<NodeJS.Timeout>();
   useEffect(() => {
-    if (isVisibleNow) {
+    if (becomesVisible) {
       // Start timer when message becomes visible
       visibilityTimer.current = setTimeout(() => {
         callback();
@@ -25,5 +25,5 @@ export const useHasStayedInViewForSeconds = (
         clearTimeout(visibilityTimer.current);
       }
     };
-  }, [isVisibleNow, ...deps]);
+  }, [becomesVisible, ...deps]);
 };

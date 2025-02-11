@@ -1,50 +1,29 @@
 import Ionicons from '@expo/vector-icons/build/Ionicons';
-import { memo, useCallback, useEffect, useRef } from 'react';
-import { FlatList, Keyboard, Text, TouchableOpacity, View } from 'react-native';
+import { memo, useCallback, useEffect } from 'react';
+import { FlatList, TouchableOpacity, View } from 'react-native';
 import { useListItemIsVisible } from '~/lib/hooks/useListItemIsVisible';
 import { useScrollToBottom } from '~/lib/hooks/useScrollToBottom';
-// import { useMessages } from '~/models/message-ops';
-// import { Message } from '~/models/types';
-import { useMessages } from '~/localStorage/messageOrm';
-import { Message } from '~/localStorage/types';
+import { useFetchMessages } from '~/sqlite/conversationUtils';
+
+import { useScrollUpToDismissKeyboard } from '~/lib/hooks/useScrollUpToDismissKeyboard';
+import { Message } from '~/sqlite/schemas';
 import { useInputStore } from '~/store/inputStore';
-import { isSystemMessage } from '../ui/utils';
 import { ChatBubble } from './ChatBubble';
-//TODO: ugly code
-
-// Add these memoized components outside the main component
-const MemoizedSystemMessage = memo(({ message }: { message: string }) => {
-  return (
-    <View>
-      <Text className="text-center text-gray-500">{message}</Text>
-    </View>
-  );
-});
-
-const MemoizedChatBubble = memo(ChatBubble);
 
 const MessageItem = memo(
   ({ item, visibleIds }: { item: Message; visibleIds: string[] }) => {
-    if (isSystemMessage(item)) {
-      return <MemoizedSystemMessage message={item.textContent} />;
-    }
-
     return (
-      <MemoizedChatBubble
-        messageId={item.messageId}
-        textContent={item.textContent}
-        userId={item.userId}
-        imageUrl={item.imageUrl}
-        sendAtDate={new Date(item.sendAtDate)}
-        isViewed={item.isViewed}
-        isVisible={visibleIds.includes(item.messageId)}
-      />
+      <ChatBubble {...item} isVisible={visibleIds.includes(item.messageId)} />
     );
   }
 );
 
-export const Conversation = () => {
-  const messages = useMessages();
+export const Conversation = ({
+  conversationId,
+}: {
+  conversationId: string;
+}) => {
+  const { data: messages } = useFetchMessages(conversationId);
   const { listRef, isAtBottom, onScrollListener, scrollToBottom } =
     useScrollToBottom();
   const { visibleIds, onViewableItemsChanged, viewabilityConfig } =
@@ -53,30 +32,9 @@ export const Conversation = () => {
       visiblePercentage: 100,
     });
   const { isInputFocused, setInputFocused } = useInputStore();
-  const lastScrollY = useRef(0);
-  const lastScrollTime = useRef(Date.now());
-
-  // Add gesture handler for scroll
-  const handleScroll = useCallback(
-    (event: any) => {
-      const currentY = event.nativeEvent.contentOffset.y;
-      const currentTime = Date.now();
-      const deltaY = currentY - lastScrollY.current;
-      const deltaTime = currentTime - lastScrollTime.current;
-
-      // Calculate velocity (pixels per millisecond)
-      const velocity = deltaTime > 0 ? deltaY / deltaTime : 0;
-      // If scrolling up (positive velocity) and input is focused, unfocus it
-      // Adjust the threshold value (0.5) as needed
-      if (velocity < -0.5 && isInputFocused) {
-        setInputFocused(false);
-        Keyboard.dismiss();
-      }
-
-      lastScrollY.current = currentY;
-      lastScrollTime.current = currentTime;
-    },
-    [isInputFocused, setInputFocused]
+  const { handleScroll } = useScrollUpToDismissKeyboard(
+    isInputFocused,
+    setInputFocused
   );
 
   useEffect(() => {
@@ -89,7 +47,7 @@ export const Conversation = () => {
 
   const scrollToMessageId = useCallback(
     (messageId: string) => {
-      const messageIndex = messages.findIndex(
+      const messageIndex = messages!.findIndex(
         (msg) => msg.messageId === messageId
       );
       if (messageIndex !== -1) {
@@ -155,19 +113,12 @@ export const Conversation = () => {
         initialNumToRender={10}
       />
 
-      {!isAtBottom ? (
+      {!isAtBottom && (
         <TouchableOpacity
           onPress={scrollToBottom}
           className="absolute bottom-4 right-4 rounded-full bg-white/80 p-2"
         >
           <Ionicons name="chevron-down" size={22} color={'gray'} />
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          onPress={() => scrollToMessageId('123')}
-          className="absolute bottom-4 right-4 rounded-full bg-white/80 p-2"
-        >
-          <Ionicons name="chevron-up" size={22} color={'gray'} />
         </TouchableOpacity>
       )}
     </View>

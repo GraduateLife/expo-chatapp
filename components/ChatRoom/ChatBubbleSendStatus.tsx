@@ -1,17 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { View } from 'react-native';
 
-type BubbleStatus = 'happening' | 'okay';
-
-const getBubbleStatusColor = (bubbleStatus: BubbleStatus) => {
-  switch (bubbleStatus) {
-    case 'happening':
-      return 'gray';
-    case 'okay':
-      return 'green';
-  }
-};
-
 export const ChatBubbleSendStatus = ({
   isUser,
   isViewed,
@@ -21,9 +10,9 @@ export const ChatBubbleSendStatus = ({
 }) => {
   if (!isUser)
     return (
-      <View className="relative">
+      <View className="relative ml-2">
         {/* is read */}
-        <Ionicons name="eye" size={18} color={isViewed ? 'green' : 'gray'} />
+        <Ionicons name="eye" size={20} color={isViewed ? 'green' : 'gray'} />
       </View>
     );
 };

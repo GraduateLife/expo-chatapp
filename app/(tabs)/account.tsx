@@ -1,6 +1,6 @@
 import { Button } from '@ui-kitten/components';
 import { Text, View } from 'react-native';
-import { clearDatabase } from '~/localStorage/util';
+import { clearDatabase } from '~/sqlite/util';
 
 export default function Contacts() {
   return (

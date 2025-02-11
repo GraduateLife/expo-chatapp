@@ -9,14 +9,12 @@ export default function Contacts() {
     navigation.setOptions({ headerTitle: 'Contacts (' + data.length + ')' });
   }, [navigation]);
   return (
-    <>
-      <FlatList
-        keyExtractor={(item) => item}
-        renderItem={({ item }) => {
-          return <ContactItem item={item} />;
-        }}
-        data={data}
-      />
-    </>
+    <FlatList
+      keyExtractor={(item) => item}
+      renderItem={({ item }) => {
+        return <ContactItem item={item} />;
+      }}
+      data={data}
+    />
   );
 }

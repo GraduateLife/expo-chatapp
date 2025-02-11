@@ -12,7 +12,7 @@ web-build/
 # expo router
 expo-env.d.ts
 
-.data
+.data/seed
 pnpm-lock.yaml
 migrations
 
