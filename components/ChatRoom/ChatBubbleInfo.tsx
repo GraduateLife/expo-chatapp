@@ -1,9 +1,9 @@
 import React from 'react';
 import { Image, Text, View } from 'react-native';
-import { Contact, UserStatus } from '~/localStorage/types';
+import { User } from '~/sqlite/schemas';
 import { cn } from '../ui/utils';
 
-type ChatBubbleInfoProps = Contact & {
+type ChatBubbleInfoProps = User & {
   className?: string;
 };
 
@@ -23,7 +23,7 @@ const getOnlineStatusColor = (userStatus: UserStatus) => {
 };
 
 export const ChatBubbleInfo = ({
-  userName,
+  username,
   avatarUrl,
   className,
   signature,
@@ -46,7 +46,7 @@ export const ChatBubbleInfo = ({
             style={{ width: 40, height: 40 }}
           >
             <Text className="text-lg text-gray-700">
-              {getUserNameFirstLetter(userName)}
+              {getUserNameFirstLetter(username)}
             </Text>
           </View>
         )}
@@ -60,7 +60,7 @@ export const ChatBubbleInfo = ({
         </View>
       </View>
       <View className="flex-1">
-        <Text className={cn('text-lg font-medium')}>{userName}</Text>
+        <Text className={cn('text-lg font-medium')}>{username}</Text>
         <Text className="text-sm text-gray-500">{signature}</Text>
       </View>
     </View>

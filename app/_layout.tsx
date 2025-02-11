@@ -3,16 +3,28 @@ import { ApplicationProvider } from '@ui-kitten/components';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Platform } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { ReactNode } from 'react';
 import { loadFonts, usePrepareApp } from '~/lib/hooks/usePrepareApp';
-import { AppSQLiteProvider } from '~/localStorage/AppSqliteProvider';
+import { AppQueryProvider } from '~/lib/tanstack/QueryProvider';
+import { AppSQLiteProvider } from '~/sqlite/AppSqliteProvider';
 import FullPageLoading from '../components/Common/FullPageLoading';
 import '../global.css';
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: 'index',
+};
+
+const AppWrapper = ({ children }: { children: ReactNode }) => {
+  return (
+    <ApplicationProvider {...eva} theme={eva.light}>
+      <AppQueryProvider>
+        <AppSQLiteProvider>{children}</AppSQLiteProvider>
+      </AppQueryProvider>
+      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
+    </ApplicationProvider>
+  );
 };
 
 export default function RootLayout() {
@@ -22,16 +34,11 @@ export default function RootLayout() {
     return <FullPageLoading />;
   }
   return (
-    <ApplicationProvider {...eva} theme={eva.light}>
-      <AppSQLiteProvider>
-        <GestureHandlerRootView>
-          <Stack>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="chatRoom" options={{ headerShown: false }} />
-          </Stack>
-        </GestureHandlerRootView>
-      </AppSQLiteProvider>
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-    </ApplicationProvider>
+    <AppWrapper>
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="chatRoom" options={{ headerShown: false }} />
+      </Stack>
+    </AppWrapper>
   );
 }

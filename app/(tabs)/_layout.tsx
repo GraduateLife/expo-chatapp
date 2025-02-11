@@ -4,13 +4,13 @@ import {
   Ionicons,
   MaterialCommunityIcons,
 } from '@expo/vector-icons';
-import { Stack, Tabs } from 'expo-router';
+import { Tabs } from 'expo-router';
+import React from 'react';
 import { View } from 'react-native';
 
 export default function MainLayout() {
   return (
     <>
-      <Stack.Screen options={{ headerShown: false }} />
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: '#38bdf8', //sky-400
@@ -46,11 +46,10 @@ export default function MainLayout() {
         <Tabs.Screen
           name="qrcode"
           options={{
-            title: 'QRCode',
-            tabBarLabel: () => <></>,
+            title: '',
             tabBarIcon: ({ color }) => (
               <View className="mt-6 h-10 w-10 items-center justify-center rounded-sm bg-gray-100">
-                <MaterialCommunityIcons name="qrcode" size={36} color={color} />
+                <MaterialCommunityIcons name="plus" size={36} color={color} />
               </View>
             ),
           }}

@@ -1,34 +1,49 @@
 import { faker } from '@faker-js/faker';
-import { MyUserId } from '~/Tempfile';
-import { Message } from '../localStorage/types';
+import { Message } from '~/sqlite/schemas';
 
 export class MessageMocker {
-  static createFakeMessage(
-    withUserId?: string,
-    conversationId?: string,
-    messageId?: string
-  ): Message {
-    const targetUserId = withUserId ?? faker.string.uuid();
+  static createFakeMessage({
+    withUserId = faker.string.uuid(),
+    conversationId = faker.string.uuid(),
+    messageId = faker.string.uuid(),
+    myUserId = faker.string.uuid(),
+    textContent = Math.random() > 0.5
+      ? faker.lorem.paragraph()
+      : faker.word.words({ count: { min: 1, max: 3 } }),
+    imageUrl = Math.random() > 0.6 ? faker.image.url() : null,
+    sendAtDate = faker.date.recent(),
+    viewedAtDate = null,
+    sequenceNumber = 0,
+  }): Message {
     return {
-      messageId: messageId ?? faker.string.uuid(),
-      userId: Math.random() > 0.5 ? targetUserId : MyUserId,
-      conversationId: conversationId ?? faker.string.uuid(),
-      textContent: faker.lorem.paragraph(),
-      isViewed: false,
-      sendAtDate: faker.date.recent(),
-      imageUrl: Math.random() > 0.7 ? faker.image.url() : undefined, // 30% chance to have an image
+      messageId: messageId,
+      userId: Math.random() > 0.5 ? withUserId : myUserId,
+      conversationId: conversationId,
+      textContent: textContent,
+      sequenceNumber: sequenceNumber,
+      viewedAtDate: viewedAtDate,
+      sendAtDate: sendAtDate,
+      imageUrl: imageUrl,
     };
   }
 
   static createMultipleMessages(
     count: number,
-    withUserId?: string,
-    conversationId?: string
+    {
+      myUserId,
+      withUserId,
+      conversationId,
+    }: { myUserId: string; withUserId: string; conversationId: string }
   ): Message[] {
     // Reset lastMessageDate if startDate is provided
 
-    return Array.from({ length: count }, () =>
-      MessageMocker.createFakeMessage(withUserId, conversationId)
+    return Array.from({ length: count }, (_, index) =>
+      MessageMocker.createFakeMessage({
+        myUserId,
+        withUserId,
+        conversationId,
+        sequenceNumber: index,
+      })
     );
   }
 
