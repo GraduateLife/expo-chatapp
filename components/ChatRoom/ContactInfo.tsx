@@ -22,7 +22,7 @@ const getOnlineStatusColor = (userStatus: UserStatus) => {
   }
 };
 
-export const ChatBubbleInfo = ({
+export const ContactInfo = ({
   username,
   avatarUrl,
   className,

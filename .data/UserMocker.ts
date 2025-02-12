@@ -29,7 +29,8 @@ export class UserMocker {
         'de',
         'zh',
       ]),
-      deletedAt: null,
+      deletedAtDate: null,
+      isBot: false,
     };
   }
 
@@ -46,7 +47,11 @@ export class UserMocker {
       lastActiveDate: faker.date.recent(),
       timezone: 'UTC',
       preferredLanguage: 'en',
-      deletedAt: null,
+      deletedAtDate: null,
+      isBot: true,
     };
+  }
+  static createManyBotUsers(count: number): User[] {
+    return Array.from({ length: count }, () => UserMocker.createBotUser());
   }
 }

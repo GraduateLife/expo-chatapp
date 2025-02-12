@@ -2,6 +2,6 @@ import { Config, defineConfig } from 'drizzle-kit';
 export default defineConfig({
   dialect: 'sqlite',
   driver: 'expo',
-  schema: './localStorage/schemas.ts',
+  schema: './sqlite/schemas.ts',
   out: './migrations',
 }) satisfies Config;

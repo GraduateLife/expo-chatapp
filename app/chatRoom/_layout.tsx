@@ -2,11 +2,7 @@ import { Stack } from 'expo-router';
 
 export default function ChatRoomLayout() {
   return (
-    <Stack
-      screenOptions={{
-        headerShown: true,
-      }}
-    >
+    <Stack>
       <Stack.Screen name="[contactId]" options={{ headerShown: false }} />
       <Stack.Screen
         name="ChatToUser.modal"

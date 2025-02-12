@@ -22,7 +22,6 @@ export default function MainLayout() {
           name="index"
           options={{
             title: 'Chats',
-
             tabBarIcon: ({ color }) => (
               <Ionicons name="chatbubbles" size={24} color={color} />
             ),
@@ -32,7 +31,6 @@ export default function MainLayout() {
           name="contacts"
           options={{
             title: 'Contacts',
-
             tabBarIcon: ({ color }) => (
               <MaterialCommunityIcons
                 name="phone-outgoing"

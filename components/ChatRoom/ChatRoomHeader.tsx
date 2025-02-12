@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Platform, Pressable, TouchableOpacity, View } from 'react-native';
-import { ChatBubbleInfo } from './ChatBubbleInfo';
+import { ContactInfo } from './ContactInfo';
 
 export const ChatRoomHeader = () => {
   const { contactId } = useLocalSearchParams();
@@ -26,11 +26,11 @@ export const ChatRoomHeader = () => {
             router.push(`/chatRoom/ChatToUser.modal?contactId=${contactId}`)
           }
         >
-          <ChatBubbleInfo
-            userName={'Joe Done'}
-            id={contactId.toString()}
+          <ContactInfo
+            username={'Joe Done'}
+            userId={contactId.toString()}
             signature={'this is a signature'}
-            onlineStatus={'busy'}
+            userStatus={'busy'}
           />
         </Pressable>
       </View>

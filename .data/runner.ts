@@ -24,7 +24,7 @@ export function generateMockData(
   writeJsonToFile(`${descriptionFileName}.json`, fn());
 }
 
-export function readJsonAsObject(fileBasename: string) {
+export function readJsonAsObject<T>(fileBasename: string): T {
   const filePath = path.join(OUTPUT_DIR, `${fileBasename}.json`);
   if (!fs.existsSync(filePath)) {
     throw new Error(`File not found: ${filePath}`);
@@ -34,6 +34,14 @@ export function readJsonAsObject(fileBasename: string) {
     throw new Error(`File content is not an object: ${fileBasename}`);
   }
   return res;
+}
+
+export function readJsonAsArray<T>(fileBasename: string): T[] {
+  const filePath = path.join(OUTPUT_DIR, `${fileBasename}.json`);
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`File not found: ${filePath}`);
+  }
+  return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 }
 
 export function readJsonProperty(fileBasename: string, property: string) {

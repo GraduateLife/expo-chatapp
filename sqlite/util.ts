@@ -4,24 +4,23 @@ import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
 import * as SQLite from 'expo-sqlite';
 import { env } from '~/env';
 import migrations from '~/migrations/migrations';
-// const db = await SQLite.openDatabaseAsync('app.db');
 
 //for most cases
-export const getDbAsync = async () => {
+export const getDbAsync = async (logPath = false) => {
   const expoDb = await SQLite.openDatabaseAsync(env.EXPO_PUBLIC_LOCAL_DB_NAME);
-  console.log('db path', expoDb.databasePath);
+  if (logPath) console.log('db path', expoDb.databasePath);
   return drizzle(expoDb);
 };
 
 //for hooks
-export const getDbSync = () => {
+export const getDbSync = (logPath = false) => {
   const expoDb = SQLite.openDatabaseSync(env.EXPO_PUBLIC_LOCAL_DB_NAME);
-  console.log('db path', expoDb.databasePath);
+  if (logPath) console.log('db path', expoDb.databasePath);
   return drizzle(expoDb);
 };
 
 export const useDrizzleMigration = () => {
-  const db = getDbSync();
+  const db = getDbSync(true);
   const { success, error } = useMigrations(db, migrations);
   return { success, error };
 };

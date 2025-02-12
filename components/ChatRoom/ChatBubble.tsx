@@ -7,13 +7,13 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 
+import { Ionicons } from '@expo/vector-icons';
 import { MyUserId } from '~/Tempfile';
 import { useVisibilityWatcher } from '~/lib/components/VisibilityWatcherView';
 import { Message } from '~/sqlite/schemas';
 import { AspectRatio } from '../Common/AspectRatio';
 import { defaultAnimationSettings } from '../ui/animation';
 import { cn, formatTime } from '../ui/utils';
-import { ChatBubbleSendStatus } from './ChatBubbleSendStatus';
 
 const BubbleDefaultColor = {
   user: 'bg-blue-100',
@@ -57,7 +57,7 @@ export const ChatBubble = ({
       <ChatBubbleHeader
         isUser={isUser}
         timestamp={formatTime(sendAtDate)}
-        isVisible={isVisible}
+        isViewed={isVisible}
       />
       <Pressable
         onPress={() => {
@@ -97,11 +97,11 @@ export const ChatBubble = ({
 const ChatBubbleHeader = ({
   isUser,
   timestamp,
-  isVisible,
+  isViewed,
 }: {
   isUser: boolean;
   timestamp: string;
-  isVisible: boolean;
+  isViewed: boolean;
 }) => {
   return (
     <View
@@ -113,7 +113,12 @@ const ChatBubbleHeader = ({
       <View className="w-fit">
         <Text className="text-sm text-gray-500">{timestamp}</Text>
       </View>
-      <ChatBubbleSendStatus isUser={isUser} isViewed={false} />
+      {!isUser && (
+        <View className="relative ml-2">
+          {/* is read */}
+          <Ionicons name="eye" size={20} color={isViewed ? 'green' : 'gray'} />
+        </View>
+      )}
     </View>
   );
 };

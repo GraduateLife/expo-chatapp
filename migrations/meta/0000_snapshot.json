@@ -1,53 +1,54 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "243bea73-5203-4b7b-befb-fcdd140907c6",
+  "id": "f119e7d8-961a-42bd-b264-9d3c6b3d00bf",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "contacts_table": {
-      "name": "contacts_table",
+    "bots_table": {
+      "name": "bots_table",
       "columns": {
-        "user_id": {
-          "name": "user_id",
+        "bot_id": {
+          "name": "bot_id",
           "type": "text",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false
         },
-        "user_name": {
-          "name": "user_name",
+        "owner_id": {
+          "name": "owner_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "avatar_url": {
-          "name": "avatar_url",
+        "bot_name": {
+          "name": "bot_name",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
-        "last_seen_date": {
-          "name": "last_seen_date",
+        "model_name": {
+          "name": "model_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "capabilities": {
+          "name": "capabilities",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at_date": {
+          "name": "created_at_date",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
-        },
-        "signature": {
-          "name": "signature",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "user_status": {
-          "name": "user_status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
         }
       },
       "indexes": {},
@@ -94,22 +95,14 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "archived": {
-          "name": "archived",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "conversations_table_created_by_user_contacts_table_user_id_fk": {
-          "name": "conversations_table_created_by_user_contacts_table_user_id_fk",
+        "conversations_table_created_by_user_users_table_user_id_fk": {
+          "name": "conversations_table_created_by_user_users_table_user_id_fk",
           "tableFrom": "conversations_table",
-          "tableTo": "contacts_table",
+          "tableTo": "users_table",
           "columnsFrom": [
             "created_by_user"
           ],
@@ -148,6 +141,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "sequence_number": {
+          "name": "sequence_number",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "text_content": {
           "name": "text_content",
           "type": "text",
@@ -170,21 +170,20 @@
           "notNull": false,
           "autoincrement": false
         },
-        "is_viewed": {
-          "name": "is_viewed",
+        "viewed_at_date": {
+          "name": "viewed_at_date",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": false
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "messages_table_user_id_contacts_table_user_id_fk": {
-          "name": "messages_table_user_id_contacts_table_user_id_fk",
+        "messages_table_user_id_users_table_user_id_fk": {
+          "name": "messages_table_user_id_users_table_user_id_fk",
           "tableFrom": "messages_table",
-          "tableTo": "contacts_table",
+          "tableTo": "users_table",
           "columnsFrom": [
             "user_id"
           ],
@@ -208,6 +207,117 @@
           "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "users_table": {
+      "name": "users_table",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "avatar_url": {
+          "name": "avatar_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "auth_provider": {
+          "name": "auth_provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "auth_provider_id": {
+          "name": "auth_provider_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "username": {
+          "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at_date": {
+          "name": "created_at_date",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "last_active": {
+          "name": "last_active",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "timezone": {
+          "name": "timezone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "preferred_language": {
+          "name": "preferred_language",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'en'"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "users_table_email_unique": {
+          "name": "users_table_email_unique",
+          "columns": [
+            "email"
+          ],
+          "isUnique": true
+        },
+        "users_table_phone_unique": {
+          "name": "users_table_phone_unique",
+          "columns": [
+            "phone"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}

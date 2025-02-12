@@ -37,6 +37,7 @@ export default function RootLayout() {
     <AppWrapper>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="chatRoom" options={{ headerShown: false }} />
       </Stack>
     </AppWrapper>

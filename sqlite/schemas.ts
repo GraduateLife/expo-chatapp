@@ -32,7 +32,7 @@ export const conversationsTable = sqliteTable('conversations_table', {
   lastMessageId: text('last_message_id'),
 });
 
-//FIXME: a mistake! should not store users in local!
+//STUB: not mistake! bots are also users (for convenience of message table userId)
 export const usersTable = sqliteTable('users_table', {
   userId: text('user_id').primaryKey(),
   avatarUrl: text('avatar_url'),
@@ -41,21 +41,25 @@ export const usersTable = sqliteTable('users_table', {
   authProvider: text('auth_provider'), // OAuth provider (e.g., google, facebook)
   authProviderId: text('auth_provider_id'), // OAuth unique ID
   username: text('username').notNull(),
+  isBot: integer('is_bot', { mode: 'boolean' }).notNull(),
   createdAtDate: integer('created_at_date', { mode: 'timestamp' })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   lastActiveDate: integer('last_active', { mode: 'timestamp' }),
   timezone: text('timezone').notNull(),
   preferredLanguage: text('preferred_language').default('en'),
-  deletedAt: integer('deleted_at', { mode: 'timestamp' }), // Soft delete
+  deletedAtDate: integer('deleted_at', { mode: 'timestamp' }), // Soft delete
 });
 
 // Bots table
 export const botsTable = sqliteTable('bots_table', {
-  botId: text('bot_id').primaryKey(),
+  botId: text('bot_id')
+    .primaryKey()
+    .references(() => usersTable.userId),
   ownerId: text('owner_id').notNull(),
   botName: text('bot_name').notNull(),
   modelName: text('model_name').notNull(),
+  systemPrompt: text('system_prompt').notNull(),
   capabilities: text('capabilities').notNull(), // JSON string for SQLite
   createdAtDate: integer('created_at_date', { mode: 'timestamp' })
     .default(sql`CURRENT_TIMESTAMP`)
