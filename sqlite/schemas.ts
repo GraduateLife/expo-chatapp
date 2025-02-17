@@ -47,7 +47,8 @@ export const usersTable = sqliteTable('users_table', {
     .notNull(),
   lastActiveDate: integer('last_active', { mode: 'timestamp' }),
   timezone: text('timezone').notNull(),
-  preferredLanguage: text('preferred_language').default('en'),
+  lastConversationId: text('last_conversation_id'),
+  preferredLanguage: text('preferred_language').default('en-US'),
   deletedAtDate: integer('deleted_at', { mode: 'timestamp' }), // Soft delete
 });
 

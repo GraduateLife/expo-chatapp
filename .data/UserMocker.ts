@@ -2,7 +2,11 @@ import { faker } from '@faker-js/faker';
 import { type User } from '../sqlite/schemas';
 
 export class UserMocker {
-  static createFakeUser(): User {
+  static createFakeUser({
+    lastConversationId = null,
+  }: {
+    lastConversationId: string | null;
+  }): User {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
 
@@ -11,6 +15,7 @@ export class UserMocker {
       avatarUrl: faker.image.url(),
       email: faker.internet.email({ firstName, lastName }),
       phone: faker.phone.number({ style: 'international' }),
+      lastConversationId: lastConversationId,
       authProvider: faker.helpers.arrayElement([
         'email',
         'google',
@@ -34,7 +39,11 @@ export class UserMocker {
     };
   }
 
-  static createBotUser(): User {
+  static createBotUser({
+    lastConversationId = null,
+  }: {
+    lastConversationId: string | null;
+  }): User {
     return {
       userId: faker.string.uuid(),
       avatarUrl: faker.image.url(),
@@ -45,13 +54,19 @@ export class UserMocker {
       username: `Bot_${faker.number.int(999)}`,
       createdAtDate: faker.date.past(),
       lastActiveDate: faker.date.recent(),
+      lastConversationId: lastConversationId,
       timezone: 'UTC',
       preferredLanguage: 'en',
       deletedAtDate: null,
       isBot: true,
     };
   }
-  static createManyBotUsers(count: number): User[] {
-    return Array.from({ length: count }, () => UserMocker.createBotUser());
+  static createManyBotUsers(
+    count: number,
+    { lastConversationId }: { lastConversationId: string | null }
+  ): User[] {
+    return Array.from({ length: count }, () =>
+      UserMocker.createBotUser({ lastConversationId })
+    );
   }
 }
