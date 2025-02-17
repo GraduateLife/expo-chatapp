@@ -4,19 +4,23 @@ import { MessageMocker } from '~/.data/MessageMocker';
 import { UserMocker } from '~/.data/UserMocker';
 import {
   generateMockData,
+  readJsonArrayProperty,
   readJsonAsArray,
   readJsonAsObject,
-  readRandomArrayProperty,
+  rewriteJsonArrayProperty,
 } from '~/.data/runner';
-import { User } from '~/sqlite/schemas';
+import { Bot, Conversation, User } from '~/sqlite/schemas';
 const GenerateMe = () => {
-  return UserMocker.createFakeUser();
+  return UserMocker.createFakeUser({ lastConversationId: null });
 };
 generateMockData(GenerateMe, 'me');
 
 const GenerateUsers = () => {
   const me = readJsonAsObject<User>('me');
-  return [me, ...UserMocker.createManyBotUsers(10)];
+  return [
+    me,
+    ...UserMocker.createManyBotUsers(10, { lastConversationId: null }),
+  ];
 };
 generateMockData(GenerateUsers, 'users');
 
@@ -40,15 +44,25 @@ const GenerateConversations = () => {
 generateMockData(GenerateConversations, 'conversations');
 
 const GenerateConversationContent = (index: number) => {
-  const conversationId = readRandomArrayProperty(
+  const conversationId = readJsonArrayProperty<Conversation, 'conversationId'>(
     'conversations',
     'conversationId',
     index
   );
   const myUserId = readJsonAsObject<User>('me').userId;
+  rewriteJsonArrayProperty<User, 'lastConversationId'>(
+    'users',
+    'lastConversationId',
+    conversationId,
+    index
+  );
 
-  const withUserId = readRandomArrayProperty('bots', 'botId', index);
-  const lastMessageId = readRandomArrayProperty(
+  const withUserId = readJsonArrayProperty<Bot, 'botId'>(
+    'bots',
+    'botId',
+    index
+  );
+  const lastMessageId = readJsonArrayProperty<Conversation, 'lastMessageId'>(
     'conversations',
     'lastMessageId',
     index
@@ -64,7 +78,7 @@ const GenerateConversationContent = (index: number) => {
       withUserId,
       conversationId,
       sequenceNumber: 10,
-      messageId: lastMessageId,
+      messageId: lastMessageId ?? undefined,
     }),
   ];
 };

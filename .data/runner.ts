@@ -55,11 +55,10 @@ export function readJsonProperty(fileBasename: string, property: string) {
   return data[property];
 }
 
-export function readRandomArrayProperty(
-  fileBasename: string,
-  property: string,
-  index?: number
-) {
+export function readJsonArrayProperty<
+  T extends { [K in P]: any },
+  P extends string,
+>(fileBasename: string, property: P, index?: number): T[P] {
   const filePath = path.join(OUTPUT_DIR, `${fileBasename}.json`);
   if (!fs.existsSync(filePath)) {
     throw new Error(`File not found: ${filePath}`);
@@ -85,6 +84,44 @@ export function readRandomArrayProperty(
   }
 
   return data[index][property];
+}
+
+export function rewriteJsonArrayProperty<
+  T extends { [K in P]: any | null },
+  P extends string,
+>(fileBasename: string, property: P, value: T[P], index: number): void {
+  const filePath = path.join(OUTPUT_DIR, `${fileBasename}.json`);
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`File not found: ${filePath}`);
+  }
+
+  const fileContent = fs.readFileSync(filePath, 'utf-8');
+  const data = JSON.parse(fileContent);
+
+  if (!Array.isArray(data)) {
+    throw new Error(`Content of ${filePath} is not an array`);
+  }
+
+  if (data.length === 0) {
+    throw new Error(`Array in ${filePath} is empty`);
+  }
+
+  if (index == -1) {
+    index = data.length - 1;
+  }
+
+  if (index >= data.length) {
+    throw new Error(
+      `Index ${index} is out of bounds for array of length ${data.length}`
+    );
+  }
+
+  if (!data[index]) {
+    data[index] = {};
+  }
+
+  data[index][property] = value;
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 }
 
 // Run the generator
