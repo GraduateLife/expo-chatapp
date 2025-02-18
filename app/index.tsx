@@ -12,7 +12,7 @@ export default function Welcome() {
 
   return (
     <>
-      <View className="flex h-full w-full bg-slate-100 ">
+      <View className="flex h-full w-full bg-slate-100">
         <SafeAreaView className="mx-auto flex h-full w-[90%] items-center justify-center">
           <Text className="font-[delius] text-6xl font-bold text-black">
             Welcome!
@@ -44,7 +44,6 @@ export default function Welcome() {
             onPress={() => {
               if (data) {
                 setResponse(data.response);
-                console.log(data);
               } else if (error) {
                 console.error('Error:', error);
               }

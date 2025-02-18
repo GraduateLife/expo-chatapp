@@ -1,5 +1,8 @@
 import { BotMocker } from '~/.data/BotMocker';
-import { ConversationMocker } from '~/.data/ConversationMocker';
+import {
+  ConversationMocker,
+  ConversationParticipantMocker,
+} from '~/.data/ConversationMocker';
 import { MessageMocker } from '~/.data/MessageMocker';
 import { UserMocker } from '~/.data/UserMocker';
 import {
@@ -43,13 +46,15 @@ const GenerateConversations = () => {
 };
 generateMockData(GenerateConversations, 'conversations');
 
+const myUserId = readJsonAsObject<User>('me').userId;
+
 const GenerateConversationContent = (index: number) => {
   const conversationId = readJsonArrayProperty<Conversation, 'conversationId'>(
     'conversations',
     'conversationId',
     index
   );
-  const myUserId = readJsonAsObject<User>('me').userId;
+
   rewriteJsonArrayProperty<User, 'lastConversationId'>(
     'users',
     'lastConversationId',
@@ -62,6 +67,7 @@ const GenerateConversationContent = (index: number) => {
     'botId',
     index
   );
+
   const lastMessageId = readJsonArrayProperty<Conversation, 'lastMessageId'>(
     'conversations',
     'lastMessageId',
@@ -83,12 +89,38 @@ const GenerateConversationContent = (index: number) => {
   ];
 };
 
-generateMockData(
-  () => GenerateConversationContent(-1),
-  'one_conversation_content'
-);
+const LinkParticipants = (conversationIndex: number, fileName: string) => {
+  generateMockData(
+    () => GenerateConversationContent(conversationIndex),
+    fileName
+  );
 
-generateMockData(
-  () => GenerateConversationContent(4),
-  'another_conversation_content'
-);
+  const conversationId = readJsonArrayProperty<Conversation, 'conversationId'>(
+    'conversations',
+    'conversationId',
+    conversationIndex
+  );
+  const withUserId = readJsonArrayProperty<Bot, 'botId'>('bots', 'botId', -1);
+
+  generateMockData(
+    () =>
+      ConversationParticipantMocker.createFakeParticipants(
+        conversationId,
+        myUserId
+      ),
+    'conversation_participants',
+    true
+  );
+  generateMockData(
+    () =>
+      ConversationParticipantMocker.createFakeParticipants(
+        conversationId,
+        withUserId
+      ),
+    'conversation_participants',
+    true
+  );
+};
+
+LinkParticipants(-1, 'one_conversation_content');
+LinkParticipants(4, 'another_conversation_content');

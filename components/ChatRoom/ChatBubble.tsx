@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Alert, Linking, Pressable, Text, View } from 'react-native';
 
 import Animated, {
@@ -7,9 +7,6 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 
-import { Ionicons } from '@expo/vector-icons';
-import { MyUserId } from '~/Tempfile';
-import { useVisibilityWatcher } from '~/lib/components/VisibilityWatcherView';
 import { Message } from '~/sqlite/schemas';
 import { AspectRatio } from '../Common/AspectRatio';
 import { defaultAnimationSettings } from '../ui/animation';
@@ -32,8 +29,7 @@ export const ChatBubble = ({
   imageUrl,
   viewedAtDate,
 }: Message) => {
-  const isUser = userId === MyUserId;
-
+  const isUser = userId === 'f80772d6-f91b-4a8f-af88-53a5219919e5';
   const [bubbleColor, setBubbleColor] = useState(
     isUser ? BubbleDefaultColor.user : BubbleDefaultColor.other
   );
@@ -41,24 +37,15 @@ export const ChatBubble = ({
   const bubbleAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
-  const ref = useRef<View>(null);
-
-  const { isVisible, onLayout } = useVisibilityWatcher(ref);
 
   return (
     <View
-      ref={ref}
-      onLayout={onLayout}
       className={cn(
         'my-3',
         isUser ? 'items-end pl-3 pr-2' : 'items-start pl-2 pr-3'
       )}
     >
-      <ChatBubbleHeader
-        isUser={isUser}
-        timestamp={formatTime(sendAtDate)}
-        isViewed={isVisible}
-      />
+      <ChatBubbleHeader isUser={isUser} timestamp={formatTime(sendAtDate)} />
       <Pressable
         onPress={() => {
           Alert.alert('Hello');
@@ -97,28 +84,18 @@ export const ChatBubble = ({
 const ChatBubbleHeader = ({
   isUser,
   timestamp,
-  isViewed,
 }: {
   isUser: boolean;
   timestamp: string;
-  isViewed: boolean;
 }) => {
   return (
     <View
       className={cn(
-        'items-center justify-between',
+        'items-center justify-between pb-1',
         isUser ? 'flex-row-reverse' : 'flex-row'
       )}
     >
-      <View className="w-fit">
-        <Text className="text-sm text-gray-500">{timestamp}</Text>
-      </View>
-      {!isUser && (
-        <View className="relative ml-2">
-          {/* is read */}
-          <Ionicons name="eye" size={20} color={isViewed ? 'green' : 'gray'} />
-        </View>
-      )}
+      <Text className="text-md text-gray-600">{timestamp}</Text>
     </View>
   );
 };

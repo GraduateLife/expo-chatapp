@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Input } from '@ui-kitten/components';
+import { Button, Input } from '@ui-kitten/components';
 import * as ImagePicker from 'expo-image-picker';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   Image,
   Keyboard,
@@ -14,10 +15,26 @@ import { ChatRoomHeader } from '~/components/ChatRoom/ChatRoomHeader';
 import { Conversation } from '~/components/ChatRoom/Conversation';
 import { AspectRatio } from '~/components/Common/AspectRatio';
 import { cn, formatFileSize, getImageAspectRatio } from '~/components/ui/utils';
+import { useFetchLastConversationId } from '~/sqlite/conversationUtils';
 import { useInputStore } from '~/store/inputStore';
 import { useMessageStore } from '~/store/messageStore';
 
 export default function ChatRoom() {
+  const router = useRouter();
+  const { contactId } = useLocalSearchParams();
+  const { data: lastConversationId, isLoading } = useFetchLastConversationId(
+    contactId as string
+  );
+  if (isLoading) return <Text>Loading...</Text>;
+  if (!lastConversationId)
+    return (
+      <View className="flex-1 items-center justify-center">
+        <Text>No conversation found</Text>
+        <Button onPress={() => router.back()}>
+          <Text>Go back</Text>
+        </Button>
+      </View>
+    );
   return (
     <KeyboardAvoidingView
       className="flex-1"
@@ -27,7 +44,7 @@ export default function ChatRoom() {
       <View className="flex-1 bg-white">
         <ChatRoomHeader />
         <View className="flex-1">
-          <Conversation conversationId="919df533-8155-44b7-9b77-7d1fabe68311" />
+          <Conversation conversationId={lastConversationId} />
         </View>
         <View className="w-full bg-white">
           <InputArea />
