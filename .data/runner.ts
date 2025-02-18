@@ -18,10 +18,26 @@ function writeJsonToFile(filename: string, data: any): void {
 }
 
 export function generateMockData(
-  fn: () => void,
-  descriptionFileName: string
+  fn: () => any,
+  descriptionFileName: string,
+  append: boolean = false
 ): void {
-  writeJsonToFile(`${descriptionFileName}.json`, fn());
+  const filePath = path.join(OUTPUT_DIR, `${descriptionFileName}.json`);
+  const newData = fn();
+
+  if (append && fs.existsSync(filePath)) {
+    const existingContent = fs.readFileSync(filePath, 'utf-8');
+    const existingData = JSON.parse(existingContent);
+
+    const mergedData =
+      Array.isArray(existingData) && Array.isArray(newData)
+        ? [...existingData, ...newData]
+        : { ...existingData, ...newData };
+
+    writeJsonToFile(`${descriptionFileName}.json`, mergedData);
+  } else {
+    writeJsonToFile(`${descriptionFileName}.json`, newData);
+  }
 }
 
 export function readJsonAsObject<T>(fileBasename: string): T {

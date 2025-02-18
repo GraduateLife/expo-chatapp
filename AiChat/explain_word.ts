@@ -1,5 +1,5 @@
 import { PromptTemplate } from '@langchain/core/prompts';
-import { ChatOllama } from '@langchain/ollama';
+import { Ollama } from '@langchain/ollama';
 
 const prompt = PromptTemplate.fromTemplate(
   `explain the following {input_language} word: {input},
@@ -7,7 +7,7 @@ const prompt = PromptTemplate.fromTemplate(
   last give at least {example_count} example of how to use it\n`
 );
 
-const llm = new ChatOllama({
+const llm = new Ollama({
   model: 'mistral',
   baseUrl: 'http://localhost:11434',
   temperature: 0,

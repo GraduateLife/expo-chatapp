@@ -1,5 +1,10 @@
 import { sql } from 'drizzle-orm';
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import {
+  integer,
+  primaryKey,
+  sqliteTable,
+  text,
+} from 'drizzle-orm/sqlite-core';
 
 // Messages table
 export const messagesTable = sqliteTable('messages_table', {
@@ -30,7 +35,28 @@ export const conversationsTable = sqliteTable('conversations_table', {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   lastMessageId: text('last_message_id'),
+  isGroupChat: integer('is_group_chat', { mode: 'boolean' })
+    .notNull()
+    .default(false),
 });
+
+// Add new table for conversation participants
+export const conversationParticipantsTable = sqliteTable(
+  'conversation_participants_table',
+  {
+    conversationId: text('conversation_id')
+      .notNull()
+      .references(() => conversationsTable.conversationId),
+    userId: text('user_id')
+      .notNull()
+      .references(() => usersTable.userId),
+    joinedAtDate: integer('joined_at_date', { mode: 'timestamp' })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    leftAtDate: integer('left_at_date', { mode: 'timestamp' }),
+  },
+  (table) => [primaryKey({ columns: [table.conversationId, table.userId] })]
+);
 
 //STUB: not mistake! bots are also users (for convenience of message table userId)
 export const usersTable = sqliteTable('users_table', {
@@ -71,3 +97,5 @@ export type Message = typeof messagesTable.$inferSelect;
 export type Conversation = typeof conversationsTable.$inferSelect;
 export type User = typeof usersTable.$inferSelect;
 export type Bot = typeof botsTable.$inferSelect;
+export type ConversationParticipant =
+  typeof conversationParticipantsTable.$inferSelect;
